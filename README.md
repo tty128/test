@@ -90,3 +90,5 @@ LaravelおよびNuxtは同一レポジトリではあるものの、LaravelはLa
   ・変更をほぼ行わない静的な部分に関してはAPIで取得せずにvue書く<br>
   ・記事部分はAPIから内容を取得する<br>
   
+# Laravel設定
+  php artisan laravel/ui 
