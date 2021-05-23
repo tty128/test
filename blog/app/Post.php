@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
@@ -10,12 +11,19 @@ class Post extends Model
     protected $primaryKey = 'post_id';
 
     protected $hidden = [
-        'post_pass'
+        'post_password'
     ];
 
-    protected $guard = [
-        'post_pass'
+    protected $fillable = [
+        'post_author',
+        'post_title',
+        'post_content',
     ];
+
+    public function setPostAuthorAttribute()
+    {
+        $this->attributes['post_author'] = 1;
+    }
 
     public function postmeta()
     {

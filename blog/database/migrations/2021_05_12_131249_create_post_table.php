@@ -15,14 +15,14 @@ class CreatePostTable extends Migration
     {
         Schema::create('post', function (Blueprint $table) {
             $table->bigIncrements('post_id');
-            $table->unsignedBigInteger('post_author');
-            $table->timestampsTz();
+            $table->unsignedBigInteger('post_author')->default(0);
+            $table->timestamps(0);
             $table->text('post_title');
             $table->longText('post_content');
-            $table->string('post_status',20);
-            $table->string('post_password', 20);
-            $table->string('post_name', 200);
-            $table->unsignedBigInteger('post_parent');
+            $table->string('post_status',20)->default('private');
+            $table->string('post_password', 16)->nullable();
+            $table->string('post_name', 200)->nullable();
+            $table->unsignedBigInteger('post_parent')->nullable();
         });
     }
 
