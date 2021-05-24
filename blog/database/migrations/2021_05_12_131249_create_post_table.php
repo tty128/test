@@ -16,6 +16,7 @@ class CreatePostTable extends Migration
         Schema::create('post', function (Blueprint $table) {
             $table->bigIncrements('post_id');
             $table->unsignedBigInteger('post_author')->default(0);
+            $table->unsignedBigInteger('post_update_author')->nullable();
             $table->timestamps(0);
             $table->text('post_title');
             $table->longText('post_content');
@@ -23,6 +24,7 @@ class CreatePostTable extends Migration
             $table->string('post_password', 16)->nullable();
             $table->string('post_name', 200)->nullable();
             $table->unsignedBigInteger('post_parent')->nullable();
+            $table->softDeletes();
         });
     }
 

@@ -41,19 +41,6 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        if (!Auth::check()) {
-            $request = null;
-            return route('login');
-        }
-
-
-        $request->merge(['post_status' => 'private']);
-        $request->merge(['post_password' => 'password']);
-        $request->merge(['post_name' => 'merge']);
-        $request->merge(['post_parent' => 1]);
-        */
-
         return Post::create($request->all());
     }
 
@@ -65,7 +52,19 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return $post;
+        switch ($post->post_status) {
+            case 'public':
+                return $post;
+
+            case 'private':
+                return Auth::id() === $post->post_author ? $post : redirect()->route('home');
+
+            case 'member':
+                return Auth::check() ? $post : redirect()->route('home');
+
+            default:
+                return redirect()->route('home');
+        }
     }
 
     /**
@@ -88,7 +87,7 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        return Post::find($id)->update($request->all());
     }
 
     /**
@@ -99,6 +98,6 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return Post::find($id)->delete();
     }
 }

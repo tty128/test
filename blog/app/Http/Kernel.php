@@ -15,8 +15,8 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
-        \App\Http\Middleware\EncryptCookies::class,           // 未チェック:https://pgmemo.tokyo/data/archives/1719.html にて記述あり「\Auth::user() を取得するために追加」
-        \Illuminate\Session\Middleware\StartSession::class,   // 未チェック:https://pgmemo.tokyo/data/archives/1719.html にて記述あり「\Auth::user() を取得するために追加」
+        \App\Http\Middleware\EncryptCookies::class,           // Apiでの動作未チェック
+        \Illuminate\Session\Middleware\StartSession::class,   // Apiでの動作未チェック
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
