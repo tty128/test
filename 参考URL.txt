@@ -1,0 +1,1 @@
+「Eloquentのboot時にtraitのbootを別に走らせる」：https://qiita.com/niisan-tokyo/items/d3be588b53df8fa0278c
