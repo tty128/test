@@ -1,1 +1,2 @@
-「Eloquentのboot時にtraitのbootを別に走らせる」：https://qiita.com/niisan-tokyo/items/d3be588b53df8fa0278c
+*「Eloquentのboot時にtraitのbootを別に走らせる」：https://qiita.com/niisan-tokyo/items/d3be588b53df8fa0278c
+*「\Auth::user() が Model の Boot メソッドで null になるのに対処する」：https://pgmemo.tokyo/data/archives/1719.html
