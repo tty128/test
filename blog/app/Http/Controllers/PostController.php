@@ -93,7 +93,14 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Post::find($id)->update($request->all());
+        $post = Post::find($id);
+        if(isset($post)){
+            $creater = $post->post_author === Auth::id() ? true : false;
+            $status = $post->post_status === 'private' ? true : false;
+            if(!$status || ($status && $creater)){
+                $post->update($request->all());
+            }
+        }
         return redirect()->route('post.all');
     }
 
@@ -105,7 +112,14 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        Post::find($id)->delete();
+        $post = Post::find($id);
+        if(isset($post)){
+            $creater = $post->post_author === Auth::id() ? true : false;
+            $status = $post->post_status === 'private' ? true : false;
+            if(!$status || ($status && $creater)){
+                $post->delete();
+            }
+        }
         return redirect()->route('post.all');
     }
 }
