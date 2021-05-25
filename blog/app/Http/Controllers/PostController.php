@@ -41,7 +41,13 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        return Post::create($request->all());
+        /* 
+            update 2021-05-25
+            modelメソッドを起動しDBに入力したいだけのコントロールメソッドだったのに
+            JSONを返していた問題を修正し、記事一覧へリダイレクトする設定に変更
+        */
+        Post::create($request->all());
+        return redirect()->route('post');
     }
 
     /**
@@ -57,13 +63,13 @@ class PostController extends Controller
                 return $post;
 
             case 'private':
-                return Auth::id() === $post->post_author ? $post : redirect()->route('home');
+                return Auth::id() === $post->post_author ? $post : redirect()->route('post');
 
             case 'member':
-                return Auth::check() ? $post : redirect()->route('home');
+                return Auth::check() ? $post : redirect()->route('post');
 
             default:
-                return redirect()->route('home');
+                return redirect()->route('post');
         }
     }
 
@@ -87,7 +93,8 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return Post::find($id)->update($request->all());
+        Post::find($id)->update($request->all());
+        return redirect()->route('post');
     }
 
     /**
