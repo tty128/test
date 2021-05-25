@@ -2,6 +2,16 @@
 
 @section('content')
 <div class="container">
+
+    <ul>
+                <router-link v-bind:to="{name: 'post.list'}" tag="li">
+                    Post
+                </router-link>
+                <router-link v-bind:to="{name: 'term.list'}" tag="li">
+                    term
+                </router-link>
+            </ul>
+            <router-view></router-view>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -19,7 +29,7 @@
             </div>
         </div>
     </div>
-    <form method="POST" action="{{ route('postcreate') }}">
+    <form method="POST" action="{{ route('post.create') }}">
         @csrf
 
         <div class="form-group row">
@@ -50,5 +60,5 @@
             {{ Auth::id() }}
         </div>
     </form>
-</div>
+</router-view>
 @endsection

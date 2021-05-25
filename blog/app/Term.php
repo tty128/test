@@ -7,7 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Term extends Model
 {
     protected $table = 'term';
-    protected $primarykey = 'term_id';
+    protected $primaryKey = 'term_id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'term_name',
+        'term_taxonomy',
+    ];
 
     public function termTaxonomy()
     {

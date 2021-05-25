@@ -1,12 +1,20 @@
+import VueRouter from 'vue-router';
+import PostListComponent from "./components/post/PostListComponent.vue";
+import TermListComponent from "./components/term/TermListComponent.vue";
+
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+//const { default: VueRouter } = require('vue-router');
+
 require('./bootstrap');
 
 window.Vue = require('vue');
+
+Vue.use(VueRouter);
 
 /**
  * The following block of code may be used to automatically register your
@@ -27,6 +35,43 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+Vue.prototype.$appRootPath = 'http://localhost:8000';
+const vue_route_path = '/manage';
+Vue.prototype.$appApiPrefix = '/api';
+
+
+Vue.prototype.$appPath = vue_route_path;
+const router = new VueRouter({
+    mode: 'history',
+    routes: [
+        {
+            path: vue_route_path + '/post',
+            name: 'post.list',
+            component: PostListComponent ,
+        },
+        {
+            path: vue_route_path + '/term',
+            name: 'term.list',
+            component: TermListComponent ,
+        }
+    ]
+});
+
 const app = new Vue({
     el: '#app',
+    methods: {
+        getJson: function (routePath) {
+            let json = null
+            let path = routePath
+            path = path.replace(this.$appPath , this.$appApiPrefix)
+            path = this.$appRootPath + path
+
+            axios
+            .get(path)
+            .then(response => (json = response.data))
+
+            return json
+        }
+    },
+    router
 });

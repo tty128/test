@@ -17,7 +17,6 @@ class CreateTermTable extends Migration
             $table->bigIncrements('term_id');
             $table->string('term_name',200);
             $table->bigInteger('term_group');
-            $table->timestamps();
         });
     }
 

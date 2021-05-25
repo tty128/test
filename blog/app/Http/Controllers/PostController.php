@@ -15,7 +15,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        return view('post.all');
+        return view('post');
     }
 
     public function apiIndex()
@@ -41,7 +41,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        /* 
+        /*
             update 2021-05-25
             modelメソッドを起動しDBに入力したいだけのコントロールメソッドだったのに
             JSONを返していた問題を修正し、記事一覧へリダイレクトする設定に変更

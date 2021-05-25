@@ -21,14 +21,11 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::middleware('auth')->group(['prefix' => 'post' , 'as' => 'post.'],function(){
-    Route::get('/', 'PostController@index')->name('all');
-    // Route::get('/edit','PostController@edit')->name('edit'); // vue.componentで実装予定    
-    
-    Route::post('/create', 'PostController@store')->name('create');
-
-    // 未チェック
-    Route::post('/update/{id}', 'PostController@update')->name('update');
-    Route::post('/delete/{id}', 'PostController@destroy')->name('delete');
-
+Route::group(['prefix' =>'manage', 'middleware' => ['auth']],function () {
+    Route::get('/', function () {
+        return view('main');
+    });
+    Route::get('{any}', function() {
+        return view('main');
+    })->where('any', '.*');
 });
