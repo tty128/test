@@ -46,7 +46,9 @@ class PostController extends Controller
             modelメソッドを起動しDBに入力したいだけのコントロールメソッドだったのに
             JSONを返していた問題を修正し、記事一覧へリダイレクトする設定に変更
         */
-        Post::create($request->all());
+        if(isset($request)){
+            Post::create($request->all());
+        }
         return redirect()->route('post.all');
     }
 
@@ -94,7 +96,7 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $post = Post::find($id);
-        if(isset($post)){
+        if(isset($post) && isset($request)){
             $creater = $post->post_author === Auth::id() ? true : false;
             $status = $post->post_status === 'private' ? true : false;
             if(!$status || ($status && $creater)){
@@ -113,7 +115,7 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
-        if(isset($post)){
+        if(isset($post) && isset($request)){
             $creater = $post->post_author === Auth::id() ? true : false;
             $status = $post->post_status === 'private' ? true : false;
             if(!$status || ($status && $creater)){
