@@ -15,7 +15,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        return view('post');
+        return view('post.all');
     }
 
     public function apiIndex()
@@ -47,7 +47,7 @@ class PostController extends Controller
             JSONを返していた問題を修正し、記事一覧へリダイレクトする設定に変更
         */
         Post::create($request->all());
-        return redirect()->route('post');
+        return redirect()->route('post.all');
     }
 
     /**
@@ -63,13 +63,13 @@ class PostController extends Controller
                 return $post;
 
             case 'private':
-                return Auth::id() === $post->post_author ? $post : redirect()->route('post');
+                return Auth::id() === $post->post_author ? $post : redirect()->route('post.all');
 
             case 'member':
-                return Auth::check() ? $post : redirect()->route('post');
+                return Auth::check() ? $post : redirect()->route('post.all');
 
             default:
-                return redirect()->route('post');
+                return redirect()->route('post.all');
         }
     }
 
@@ -94,7 +94,7 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         Post::find($id)->update($request->all());
-        return redirect()->route('post');
+        return redirect()->route('post.all');
     }
 
     /**
@@ -105,6 +105,7 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        return Post::find($id)->delete();
+        Post::find($id)->delete();
+        return redirect()->route('post.all');
     }
 }
