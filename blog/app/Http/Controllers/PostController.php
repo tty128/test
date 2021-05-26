@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Post;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -18,9 +19,13 @@ class PostController extends Controller
         return view('post');
     }
 
-    public function apiIndex()
-    {
-        return Post::all();
+    public function apiIndex(){
+        $posts = Post::where('post_author','=', Auth::id())
+                    ->orWhere('post_status','<>','private')
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(12);
+        return $posts;
+
     }
 
     /**
@@ -41,11 +46,6 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-            update 2021-05-25
-            modelメソッドを起動しDBに入力したいだけのコントロールメソッドだったのに
-            JSONを返していた問題を修正し、記事一覧へリダイレクトする設定に変更
-        */
         if(isset($request)){
             Post::create($request->all());
         }
@@ -96,13 +96,9 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $post = Post::find($id);
-        if(isset($post) && isset($request)){
-            $creater = $post->post_author === Auth::id() ? true : false;
-            $status = $post->post_status === 'private' ? true : false;
-            if(!$status || ($status && $creater)){
-                $post->update($request->all());
-            }
-        }
+        if($this->runCheck($request, $post)){
+            $post->update($request->all());
+        };
         return redirect()->route('post.all');
     }
 
@@ -112,16 +108,24 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $post = Post::find($id);
-        if(isset($post) && isset($request)){
-            $creater = $post->post_author === Auth::id() ? true : false;
-            $status = $post->post_status === 'private' ? true : false;
-            if(!$status || ($status && $creater)){
-                $post->delete();
+        if ($this->runCheck($request, $post)) {
+            $post->delete();
+        };
+        return redirect()->route('post.all');
+    }
+
+    public function runCheck(Request $request, Post $model)
+    {
+        if (isset($model, $request)) {
+            $creater = $model->post_author === Auth::id() ? true : false;
+            $status = $model->post_status !== 'private' ? true : false;
+            if ($status || $creater) {
+                return true;
             }
         }
-        return redirect()->route('post.all');
+        return false;
     }
 }
