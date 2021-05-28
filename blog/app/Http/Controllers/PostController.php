@@ -14,27 +14,14 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request,Post $posts)
     {
-        return view('post');
-    }
-
-    public function apiIndex(){
-        $posts = Post::where('post_author','=', Auth::id())
-                    ->orWhere('post_status','<>','private')
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(12);
-        return $posts;
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
+        $limit =  $request->has('limit') && $request->limit != 0 ? $request->limit : 12;
+        $posts = $posts->where('post_author', '=', Auth::id())
+            ->orWhere('post_status', '<>', 'private')
+            ->orderBy('created_at', 'desc')
+            ->paginate($limit);
+        return $request->has('limit') ? $posts->appends(['limit' => $limit]) : $posts ;
 
     }
 
@@ -49,7 +36,6 @@ class PostController extends Controller
         if(isset($request)){
             Post::create($request->all());
         }
-        return redirect()->route('post.all');
     }
 
     /**
@@ -65,13 +51,13 @@ class PostController extends Controller
                 return $post;
 
             case 'private':
-                return Auth::id() === $post->post_author ? $post : redirect()->route('post.all');
+                return Auth::id() == $post->post_author ? $post : ['error' => '記事は非公開です'];
 
             case 'member':
-                return Auth::check() ? $post : redirect()->route('post.all');
+                return Auth::check() ? $post : redirect()->route('login');
 
             default:
-                return redirect()->route('post.all');
+                return redirect()->route('login');
         }
     }
 
@@ -81,7 +67,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($limit, $id)
     {
         //
     }
@@ -93,7 +79,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $limit, $id)
     {
         $post = Post::find($id);
         if($this->runCheck($request, $post)){
@@ -108,7 +94,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request,$id)
+    public function destroy(Request $request, $limit, $id)
     {
         $post = Post::find($id);
         if ($this->runCheck($request, $post)) {

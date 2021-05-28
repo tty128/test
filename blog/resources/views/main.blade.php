@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    <form method="POST" action="{{ route('post.create') }}">
+    <form method="POST" action="{{ route('post.index') }}">
         @csrf
 
         <div class="form-group row">
