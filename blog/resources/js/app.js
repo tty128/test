@@ -1,5 +1,5 @@
 import VueRouter from 'vue-router';
-import PostListComponent from "./components/post/PostListComponent.vue";
+import PostListComponent from "./components/Main.vue";
 import TermListComponent from "./components/term/TermListComponent.vue";
 
 /**
@@ -28,6 +28,12 @@ Vue.use(VueRouter);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component('laravel-main', require('./components/Main.vue').default);
+Vue.component('laravel-modal', require('./components/ElementModal.vue').default);
+Vue.component('laravel-element-card', require('./components/ElementCard.vue').default);
+Vue.component('laravel-pagination', require('./components/Pagination.vue').default);
+Vue.component('laravel-header', require('./components/Header.vue').default);
+Vue.component('laravel-vue-csrf', require('./components/VueCSRF.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -35,7 +41,7 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.prototype.$appRootPath = 'http://localhost:8000';
+Vue.prototype.$appRootPath = '';
 const vue_route_path = '/manage';
 Vue.prototype.$appApiPrefix = '/api';
 

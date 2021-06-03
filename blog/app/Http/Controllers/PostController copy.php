@@ -14,13 +14,14 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request,Post $post)
+    public function index(Request $request,Post $posts)
     {
-        $post = $post->where('post_author', '=', $request->user()->id)
+        $limit =  $request->has('limit') && $request->limit != 0 ? $request->limit : 12;
+        $posts = $posts->where('post_author', '=', $request->user()->id)
             ->orWhere('post_status', '<>', 'private')
             ->orderBy('created_at', 'desc')
-            ->get();
-        return $post;
+            ->paginate($limit);
+        return $request->has('limit') ? $posts->appends(['limit' => $limit]) : $posts ;
 
     }
 

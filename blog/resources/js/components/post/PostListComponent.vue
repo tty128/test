@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
@@ -7,6 +8,7 @@
 
                     <div class="card-body">
                         test Post List
+                        {{ token }}
                         {{ info }}
                     </div>
                 </div>
@@ -17,6 +19,9 @@
 
 <script>
     export default {
+        props:{
+            token:String
+        },
         data(){
             return {
                 info:null
@@ -25,13 +30,14 @@
         methods:{
             getPostList:function(routePath){
                 let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix)
+                path = path + '?api_token=' + this.token
 
                 axios
                 .get(path)
                 .then(response => (this.info = response.data))
             }
         },
-        created(){
+        mounted(){
             this.getPostList(this.$route.path)
         }
     }

@@ -23,9 +23,9 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['prefix' =>'manage', 'middleware' => ['auth']],function () {
     Route::get('/', function () {
-        return view('main');
+        return view('manage');
     });
     Route::get('{any}', function() {
-        return view('main');
+        return view('manage');
     })->where('any', '.*');
 });
