@@ -58,14 +58,12 @@
             token:String,
             action:String,
             post_id:Number,
-
         },
         data:function(){
             return {
                 items:null,
                 new_title:null,
                 new_content:null,
-
             }
         },
         watch:{
@@ -74,15 +72,30 @@
                 this.new_content = null
                 if(this.action === 'create' || this.post_id !== null){
                     let postId = '/' + this.post_id
-
                     let routePath = this.$route.path
                     let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + postId
-
                     const response = await axios.get(path ,{params:{api_token:this.token}})
-
                     this.items = response.data
                     this.new_title = this.items.post_title
                     this.new_content = this.items.post_content
+                }
+            },
+            event_on : function(){
+                const bs = document.body.style
+                if(this.event_on){
+                    const ws = -1 * window.scrollY
+                    bs.position = 'fixed'
+                    bs.top = ws +'px'
+                    bs.width = '100%'
+                    bs.paddingRight = '15px'
+                }
+                else{
+                    const top = bs.top
+                    bs.position = ''
+                    bs.top = ''
+                    bs.width = ''
+                    bs.paddingRight = ''
+                    window.scrollTo(0, parseInt(top , '0') * -1)
                 }
             }
         },
@@ -91,15 +104,12 @@
                 return this.items !== null && this.post_id == this.items.post_id
             },
             emitAction: function () {
-
                 this.$emit('element_modal_action', false )
             },
-            sendAPIs:function( state ){
+            sendAPIs: function( state ){
                 let postId = this.action !== 'create' && this.post_id !== null && this.post_id !=='undefind' ? '/' + this.post_id : '';
-
                 let routePath = this.$route.path
                 let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + postId
-
                 switch(state){
                     case 'edit':
                         axios
@@ -144,41 +154,30 @@
 <style scoped>
     #Modal {
         z-index:10;
-
         position:fixed;
         top:0;
         left: 100%;
-
         width: 70vw;
         height: 100%;
-
         padding: 75px 2rem 0;
-
         background: rgb(113, 202, 165);
         color:white;
         filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
-
         transition:all 0.3s;
     }
-
     #Modal.visible {
         transform: translateX(-100%)
     }
-
     #Modal .close_button {
         position:sticky;
         top:2rem;
-
         display: flex;
         justify-content: center;
         align-items: center;
         width: 5rem;
         height: 5rem;
-
         float:left;
-
         border-radius: 2.5rem;
-
         color: rgb(113, 202, 165);
         background: white;
     }
@@ -201,25 +200,19 @@
             transition: all 0.3s;
             background: rgb(113, 202, 165);
         }
-
     #Modal .action{
         display:flex;
         justify-content: center;
         align-items: center;
-
         height:5rem;
-
         margin:0 auto;
-
         opacity:0;
-
         transition-delay:1s;
         transition:all 0.3s;
     }
     #Modal.visible .action{
         opacity:1 !important;
     }
-
     #Modal .wrapper.create{
         display:flex;
         align-items:center;
