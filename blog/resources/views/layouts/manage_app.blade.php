@@ -22,7 +22,12 @@
 </head>
 <body>
     <div id="app">
-        
+        <laravel-manage-header
+            :app_name="{{ config('app.name', 'Laravel') }}"
+            :user_name="{{ Auth::user()->name }}"
+            route_logout="/logout"
+
+        ></laravel-manage-header>
 
         <main class="py-4">
             @yield('content')

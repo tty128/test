@@ -1,12 +1,13 @@
 <template>
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{{ route.host }}">
-                {{ appname }}
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <router-link
+                    :to="{path:'/manage'}"
+                    tag="a"
+                    class="navbar-brand"
+            >
+                @{{ appName }}
+            </router-link>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
@@ -14,30 +15,24 @@
 
                 <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ml-auto">
-                    <!-- Authentication Links -->
 
-                    <li class="nav-item" v-if="{{ guest }}">
-                        <a class="nav-link" href="{{ route.login }}">LOGIN</a>
-                    </li>
-
-                    <li class="nav-item" v-if="{{ useradmin }}">
-                        <a class="nav-link" href="{{ route.register }}">REGISTER</a>
-                    </li>
-
-                    <li class="nav-item dropdown" v-if="!{{ guest }}">
+                    <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ username }} <span class="caret"></span>
+                            @{{ userName }} <span class="caret"></span>
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route.logout }}"
+                            <a class="dropdown-item" :href="routeLogout"
                                onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                 LOGOUT
                             </a>
 
-                            <form id="logout-form" action="{{ route.logout }}" method="POST" style="display: none;">
-                                //<VueCSRF />
+                            <form id="logout-form" :action="route_logout" method="POST" style="display: none;">
+                                <laravel-vue-csrf
+                                    :csrf="CSRF"
+                                >
+                                </laravel-vue-csrf>
                             </form>
                         </div>
                     </li>
@@ -48,20 +43,30 @@
 </template>
 
 <script>
-    module.exports = {
+    export default {
+        props:{
+            app_name:String,
+            user_name:String,
+            route_logout:String,
+            csrf:Array
+        },
         data: function() {
             return{
-                routes: {
-                    host:'/'
-                    register: '/register'
-                    logout: '/logout'
-                    login: '/login'
-                }
-                appname: 'vue'
-                username: 'admin'
-                useradmin: false
-                guest:true
             }
+        },
+        computed:{
+            appName:function(){
+                return this.app_name
+            },
+            userName:function(){
+                return this.user_name
+            },
+            routeLogout:function(){
+                return this.route_logout
+            },
+            CSRF:function(){
+                return this.csrf
+            },
         }
     }
 </script>
@@ -69,7 +74,7 @@
 <style scoped>
     nav {
         position:relative;
-        
+
         display:flex;
         align-items:center;
         justify-content:flex-start;

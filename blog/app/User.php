@@ -41,6 +41,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function created_post()
+    {
+        return $this->hasMany('App\Post', 'post_author','user_id');
+    }
+
+    public function updated_post()
+    {
+        return $this->hasMany('App\Post', 'post_update_author', 'user_id');
+    }
+
     public static function boot()
     {
         parent::boot();

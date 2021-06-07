@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('details', 'API\UserController@details');
 //Route::get('/post', 'PostController@apiIndex')->name('posts');
 Route::group(['middleware' => 'auth:api'],function () {
     Route::apiResource('post', 'PostController');
+    Route::apiResource('term', 'TermController');
 });
 
 // 今回は外部APIでPOSTたたかないため関係ないが、一応apiでPOSTした場合のチェックしてみたい。

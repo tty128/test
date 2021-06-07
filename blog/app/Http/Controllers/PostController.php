@@ -16,18 +16,22 @@ class PostController extends Controller
      */
     public function index(Request $request,Post $post)
     {
-        $post = $post->where('post_author', '=', $request->user()->id)
+        $post = $post
+            ->where('post_author', '=', $request->user()->id)
             ->orWhere('post_status', '<>', 'private')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('post.created_at', 'desc')
+            ->join('users as pca', 'post_author', '=', 'pca.id')
+            ->leftJoin('users as pua', 'post_update_author', '=', 'pua.id')
             ->get([
                 'post_id',
-                'post_author',
-                'post_update_author',
-                'created_at',
-                'updated_at',
+                'post.created_at',
+                'post.updated_at',
                 'post_status',
-                'post_title'
+                'post_title',
+                'pca.name as post_author_name',
+                'pua.name as post_update_author_name',
             ]);
+
         return $post;
 
     }
@@ -49,17 +53,17 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post)
+    public function show(Request $request, Post $post)
     {
         switch ($post->post_status) {
             case 'public':
                 return $post;
 
             case 'private':
-                return Auth::id() == $post->post_author ? $post : ['error' => '記事は非公開です'];
+                return $request->user()->id == $post->post_author ? $post : ['error' => '記事は非公開です'];
 
             case 'member':
-                return Auth::check() ? $post : redirect()->route('login');
+                return isset($request->user()->id) ? $post : redirect()->route('login');
 
             default:
                 return redirect()->route('login');

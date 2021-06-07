@@ -1,7 +1,7 @@
 <template>
     <section>
 
-        <h1>test</h1>
+        <h1>{{items}}</h1>
         <div
              class="post_create"
              @click ="elementCardAction(null,'create')"
@@ -50,11 +50,11 @@
 
     export default {
         props: {
-            token: String
+            token: String,
+            items: Array,
         },
         data: function () {
             return {
-                items: null,
                 limit: 250,
                 modal:false,
                 modal_post_id:null,
@@ -93,7 +93,6 @@
                     document.body.style.width = ''
                     document.body.style.paddingRight = ''
                     window.scrollTo(0, parseInt(top , '0') * -1)
-                    this.getAPIs()
                 }
 
             }
@@ -122,11 +121,7 @@
 
                 this.items = response.data
             }
-        },
-        created: function () {
-            this.getAPIs()
         }
-
 
     }
 </script>

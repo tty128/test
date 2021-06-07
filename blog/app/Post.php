@@ -23,6 +23,16 @@ class Post extends Model
         'post_content',
     ];
 
+    public function author()
+    {
+        return $this->belongsTo('App\User', 'post_author','user_id');
+    }
+
+    public function updateAuthor()
+    {
+        return $this->belongsTo('App\User', 'post_update_author', 'user_id');
+    }
+
     public function postmeta()
     {
         return $this->hasOne('App\PostMeta','post_id');

@@ -1,7 +1,7 @@
 <template>
     <section>
 
-        <h1>{{ items.data[200].post_title }}</h1>
+        <h1>{{ items.data[200] }}</h1>
         <div
              class="post_create"
              @click ="elementCardAction(null,'create')"
@@ -16,7 +16,8 @@
 
         <ul class='post_all'>
             <li
-                v-for="(item,index) in items.data"
+                v-for="item in items.data"
+                :key="item.post_id"
                 class="post_body"
             >
                 <laravel-element-card

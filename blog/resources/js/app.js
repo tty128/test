@@ -29,10 +29,11 @@ Vue.use(VueRouter);
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('laravel-main', require('./components/Main.vue').default);
+Vue.component('laravel-main-handle', require('./components/MainHandle.vue').default);
 Vue.component('laravel-modal', require('./components/ElementModal.vue').default);
 Vue.component('laravel-element-card', require('./components/ElementCard.vue').default);
 Vue.component('laravel-pagination', require('./components/Pagination.vue').default);
-Vue.component('laravel-header', require('./components/Header.vue').default);
+Vue.component('laravel-manage-header', require('./components/ManageHeader.vue').default);
 Vue.component('laravel-vue-csrf', require('./components/VueCSRF.vue').default);
 
 /**

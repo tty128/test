@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Trem;
+use App\Term;
 use App\MyTrait;
 use Illuminate\Http\Request;
 
@@ -16,9 +16,9 @@ class TermController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Term $term)
     {
-        //
+        return $term;
     }
 
     /**
