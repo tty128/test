@@ -19,7 +19,15 @@ class PostController extends Controller
         $post = $post->where('post_author', '=', $request->user()->id)
             ->orWhere('post_status', '<>', 'private')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get([
+                'post_id',
+                'post_author',
+                'post_update_author',
+                'created_at',
+                'updated_at',
+                'post_status',
+                'post_title'
+            ]);
         return $post;
 
     }
@@ -32,9 +40,7 @@ class PostController extends Controller
      */
     public function store(Request $request,Post $post)
     {
-        if(isset($request)){
-            $post->create($request->all());
-        }
+        $post->create($request->all());
     }
 
     /**
