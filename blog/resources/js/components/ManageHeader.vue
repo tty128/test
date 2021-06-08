@@ -6,7 +6,7 @@
                     tag="a"
                     class="navbar-brand"
             >
-                @{{ appName }}
+                {{ appName }}
             </router-link>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -17,20 +17,31 @@
                 <ul class="navbar-nav ml-auto">
 
                     <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            @{{ userName }} <span class="caret"></span>
+                        <a
+                            id="navbarDropdown"
+                            class="nav-link dropdown-toggle"
+                            href="#"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        >
+                            {{ userName }}
+                            <span class="caret"></span>
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" :href="routeLogout"
-                               onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                            <a
+                                class="dropdown-item"
+                                :href="routeLogout"
+                                @click="logoutButton"
+                            >
                                 LOGOUT
                             </a>
 
                             <form id="logout-form" :action="route_logout" method="POST" style="display: none;">
                                 <laravel-vue-csrf
-                                    :csrf="CSRF"
+                                    :csrf="CSRFtoken"
                                 >
                                 </laravel-vue-csrf>
                             </form>
@@ -64,9 +75,15 @@
             routeLogout:function(){
                 return this.route_logout
             },
-            CSRF:function(){
+            CSRFtoken:function(){
                 return this.csrf
             },
+        },
+        methods:{
+            logoutButton:function(){
+                event.preventDefault()
+                document.getElementById('logout-form').submit();
+            }
         }
     }
 </script>
