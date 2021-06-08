@@ -20,7 +20,7 @@ class TermTaxonomy extends Model
 
     public function term()
     {
-        return $this->hasOne('App\Term', 'term_id');
+        return $this->belongsTo('App\Term');
     }
 
     public function termRelationship()
