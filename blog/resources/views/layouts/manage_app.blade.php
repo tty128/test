@@ -23,8 +23,8 @@
 <body>
     <div id="app">
         <laravel-manage-header
-            :app_name="{{ config('app.name', 'Laravel') }}"
-            :user_name="{{ Auth::user()->name }}"
+            app_name="{{ config('app.name', 'Laravel') }}"
+            user_name="{{ Auth::user()->name }}"
             route_logout="/logout"
 
         ></laravel-manage-header>
