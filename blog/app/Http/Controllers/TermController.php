@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Term;
-use App\MyTrait;
 use Illuminate\Http\Request;
 
 class TermController extends Controller
 {
-
-    use MyTrait\ControllerTrait;
 
     /**
      * Display a listing of the resource.
@@ -18,6 +15,16 @@ class TermController extends Controller
      */
     public function index(Term $term)
     {
+        $term = $term->from('term_taxonomy as ttx')
+            ->join('term as t','ttx.term_id','=','t.term_id')
+            ->get([
+                'term_taxonomy_id',
+                'taxonomy as taxonomy_name',
+                't.term_name as term_name',
+                'desc',
+                'ttx.created_at',
+                'ttx.updated_at',
+            ]);
         return $term;
     }
 
@@ -39,7 +46,7 @@ class TermController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Term::create($request->all());
     }
 
     /**
@@ -48,9 +55,9 @@ class TermController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Term $term)
     {
-        //
+        return $term;
     }
 
     /**
@@ -71,9 +78,9 @@ class TermController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Term $term)
     {
-        //
+        $term->update($request->all());
     }
 
     /**
@@ -82,8 +89,8 @@ class TermController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Term $term)
     {
-        //
+        $term->delete();
     }
 }
