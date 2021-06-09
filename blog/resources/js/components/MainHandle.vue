@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="mainhandle__container">
         <aside>
             <ul>
                 <router-link
@@ -100,45 +100,51 @@
 </script>
 
 <style scoped>
-    section {
-        transition: all 0.5s;
+    .router-link-active{
+        background: rgb(113, 202, 165);
+        color:white;
     }
 
-    section .post_create {
-        backface-visibility: hidden;
+    .mainhandle__container {
+        margin-top:5rem;
+    }
+
+    aside{
+        position: fixed;
+        left: 0;
+
+        width: 20%;
+    }
+
+    article{
+        position: relative;
+        top:2rem;
+        left: 20%;
+
+        width: 80%;
+    }
+
+    aside ul {
+        list-style: none;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 0;
+    }
+
+    aside ul li {
         cursor: pointer;
+        user-select:none;
+
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 20rem;
-        height: 4rem;
-        margin: 1rem auto;
-        font-size:1.3rem;
-        color: white;
-        border-radius: 2rem;
-        background: #367678;
-        transition: all 0.2s;
-    }
-
-        section .post_create:hover {
-
-            transform: scale(1.01);
-            filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
-        }
-
-    section .post_all {
-        list-style: none;
-
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        flex-wrap: wrap;
 
         width: 100%;
-        height: auto;
+        min-height: 4rem;
 
-        margin: 0px auto;
-        padding: 0px;
+        transition:all 0.3s;
     }
 
 </style>

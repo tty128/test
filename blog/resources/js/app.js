@@ -33,6 +33,7 @@ Vue.component('laravel-main-handle', require('./components/MainHandle.vue').defa
 Vue.component('laravel-modal', require('./components/ElementModal.vue').default);
 Vue.component('laravel-element-card', require('./components/ElementCard.vue').default);
 Vue.component('laravel-pagination', require('./components/Pagination.vue').default);
+Vue.component('laravel-pagination-limit', require('./components/PaginateLimitButton.vue').default);
 Vue.component('laravel-manage-header', require('./components/ManageHeader.vue').default);
 Vue.component('laravel-vue-csrf', require('./components/VueCSRF.vue').default);
 
@@ -41,6 +42,15 @@ Vue.component('laravel-vue-csrf', require('./components/VueCSRF.vue').default);
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+Vue.mixin({
+    methods: {
+        $isSetable: function ($var) {
+            return !isNaN($var) && typeof($var) !== null && typeof($var) !== 'undefined'
+        }
+    }
+})
+
 
 Vue.prototype.$appRootPath = '';
 const vue_route_path = '/manage';

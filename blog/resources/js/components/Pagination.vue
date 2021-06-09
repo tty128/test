@@ -1,20 +1,35 @@
 <template>
-    <ul id="Paginate">
+    <ul
+        class="vue_paginate"
+        v-if="lastPage > 1"
+    >
         <li
             :class="['page-prev' , !isFirstPage() ? 'invisible' : '']"
             @click="pageRoutePrev()"
         >
             Prev
         </li>
+        <li
+            :class="['page-1' , startViewPages <= 0 ? 'invisible' : '']"
+            @click="pageRoute(1)"
+        >
+            1
+        </li>
         <li>
             <div
-                v-for="n in lastPage"
+                v-for="n in  maxViewPages"
                 :key="n"
-                :class="['page-' + n , isCurrent( n ) ? 'paginate-current':'']"
+                :class="['page-' + ( n + startViewPages ) , isCurrent( n + startViewPages ) ? 'paginate-current':'']"
                 @click = "[isCurrent( n ) ? '':pageRoute( n )]"
             >
-                {{ n }}
+                {{ n + startViewPages }}
             </div>
+        </li>
+        <li
+            :class="['page-' + lastPage , !(startViewPages >= maxViewPages) ? 'invisible' : '']"
+            @click="pageRoute(lastPage)"
+        >
+            {{ lastPage }}
         </li>
         <li
             :class="['page-next' , !isLastPage() ? 'invisible' : '']"
@@ -29,11 +44,35 @@
     export default {
         props: {
             last_page: Number,
-            current_page: Number
+            current_page: Number,
+            max_view_pages:Number,
         },
         computed:{
             lastPage:function(){
-                return this.last_page !== null && this.last_page !=='undefined' ? this.last_page : 1
+                return this.$isSetable(this.last_page) ? this.last_page : 1
+            },
+            maxViewPages:function(){
+                let mvp = this.max_view_pages > this.last_page ? this.last_page : this.max_view_pages
+                return mvp
+            },
+            startViewPages:function(){
+                let n = 0
+                let mvp = this.max_view_pages > this.lastPage ? this.lastPage : this.max_view_pages
+                let mvp_r = Math.floor(mvp/2)
+
+                let lp = this.$isSetable(this.last_page) ? this.last_page : 1
+                let cp = this.$isSetable(this.crrent_page) ? this.crrent_page : 1
+
+                if(cp - mvp_r <= 0 ){
+                    n = 0
+                }
+                else if(cp + mvp_r >= lp){
+                    n = lp - mvp
+                }
+                else{
+                    n = cp - mvp_r
+                }
+                return n
             }
         },
         methods: {
@@ -65,7 +104,7 @@
 </script>
 
 <style scoped>
-    #Paginate {
+    .vue_paginate {
         list-style:none;
 
         display:flex;
@@ -77,19 +116,20 @@
         margin:0 auto;
         padding:0;
     }
-        #Paginate .invisible {
+
+        .vue_paginate .invisible {
             pointer-events: none !important;
             opacity: 0 !important;
         }
 
-        #Paginate li{
+        .vue_paginate li{
             display: flex;
             align-items: center;
             justify-content: center;
             width: auto;
         }
 
-        #Paginate [class^="page-"] {
+        .vue_paginate [class^="page-"] {
             user-select:none;
             cursor:pointer;
 
@@ -107,7 +147,7 @@
             background: #E6F6D1;
         }
 
-        #Paginate .page-next , #Paginate .page-prev {
+        .vue_paginate .page-next , .vue_paginate .page-prev {
             padding: 0 1rem;
         }
 

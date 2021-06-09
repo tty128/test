@@ -2,14 +2,14 @@
     <header class="manage__header">
         <div class="wrapper">
             <router-link
-                    :to="{path:'/'}"
+                    :to="{path:$appPath}"
                     tag="a"
                     id="manage__Logo"
             >
                 {{ appName }}
             </router-link>
 
-            <div class="container">
+            <div class="manage__container">
                 <ul class="manage__header_ul">
                     <li>
                         <input type="checkbox" name="username" id="Button__UserName">
@@ -29,9 +29,9 @@
                                 </a>
 
                                 <form id="logout-form" :action="route_logout" method="POST" style="display: none;">
-                                    <!-- <laravel-vue-csrf
+                                    <laravel-vue-csrf
                                         :csrf="CSRFtoken"
-                                    ></laravel-vue-csrf> -->
+                                    ></laravel-vue-csrf>
                                 </form>
                             </li>
                         </ul>
@@ -77,17 +77,16 @@ header.manage__header{
     color:white;
     background: red;
 }
-header.manage__header >.wrapper >.container{background : green;}
+header.manage__header >.wrapper >.manage__container{background : green;}
 #manage__Logo{background: blue;}
 .manage__header_ul .manage__dropdown_menu{background: cornflowerblue;}
 .manage__header_ul .label_button{background: coral;}
-
-
 
 header.manage__header{
     z-index: 100;
 
     position: fixed;
+    top:0;
 
     width:100%;
     height: 5rem;
@@ -125,10 +124,9 @@ header.manage__header a:visited{
     min-width: 8rem;
     height: 100%;
 
-
 }
 
-header.manage__header >.wrapper >.container{
+header.manage__header >.wrapper >.manage__container{
     height: 100%;
 
     float: right;

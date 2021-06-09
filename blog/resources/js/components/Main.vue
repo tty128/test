@@ -1,7 +1,5 @@
 <template>
     <section>
-
-        <h1>{{items}}</h1>
         <div
              class="post_create"
              @click ="elementCardAction(null,'create')"
@@ -9,9 +7,15 @@
             Create New Post
         </div>
 
+        <laravel-pagination-limit
+            @element_limit_action="elementLimitAction"
+            :limits="limits"
+        ></laravel-pagination-limit>
+
         <laravel-pagination
-            :last_page = "lastPage"
-            :current_page = "currentPage"
+            :last_page="lastPage"
+            :current_page="currentPage"
+            :max_view_pages="paginate_max_pages"
         ></laravel-pagination>
 
         <ul class='post_all'>
@@ -32,8 +36,9 @@
         </ul>
 
         <laravel-pagination
-            :last_page = "lastPage"
-            :current_page = "currentPage"
+            :last_page="lastPage"
+            :current_page="currentPage"
+            :max_view_pages="paginate_max_pages"
         ></laravel-pagination>
 
         <laravel-modal
@@ -55,7 +60,9 @@
         },
         data: function () {
             return {
-                limit: 250,
+                paginate_max_pages:5,
+                limits:[12,24,36],
+                limit: 12,
                 modal:false,
                 modal_post_id:null,
                 modal_action:null,
@@ -77,27 +84,11 @@
                 return this.items.slice( (current_page - 1) * this.limit , current_page * this.limit )
             },
         },
-        watch:{
-            modal : function(on){
-                if(on){
-                    const ws = -1 * window.scrollY
-                    document.body.style.position = 'fixed'
-                    document.body.style.top = ws +'px'
-                    document.body.style.width = '100%'
-                    document.body.style.paddingRight = '15px'
-                }
-                else{
-                    const top = document.body.style.top
-                    document.body.style.position = ''
-                    document.body.style.top = ''
-                    document.body.style.width = ''
-                    document.body.style.paddingRight = ''
-                    window.scrollTo(0, parseInt(top , '0') * -1)
-                }
-
-            }
-        },
         methods: {
+            elementLimitAction:function(num){
+                console.log(num)
+                this.limit = num
+            },
             elementCardAction: function(...arg){
                 let [id, action] = arg
                 this.modal_post_id=id

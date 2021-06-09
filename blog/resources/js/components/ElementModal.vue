@@ -81,20 +81,25 @@
                 }
             },
             event_on : function(){
+                const sbar = window.scrollbars.visible
                 const bs = document.body.style
                 if(this.event_on){
                     const ws = -1 * window.scrollY
                     bs.position = 'fixed'
                     bs.top = ws +'px'
                     bs.width = '100%'
-                    bs.paddingRight = '15px'
+                    if(sbar){
+                        bs.paddingRight = '15px'
+                    }
                 }
                 else{
                     const top = bs.top
                     bs.position = ''
                     bs.top = ''
                     bs.width = ''
-                    bs.paddingRight = ''
+                    if(sbar){
+                        bs.paddingRight = ''
+                    }
                     window.scrollTo(0, parseInt(top , '0') * -1)
                 }
             }
@@ -153,20 +158,32 @@
 
 <style scoped>
     #Modal {
-        z-index:10;
-        position:fixed;
-        top:0;
-        left: 100%;
-        width: 70vw;
-        height: 100%;
-        padding: 75px 2rem 0;
         background: rgb(113, 202, 165);
         color:white;
         filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
+    }
+    #Modal .close_button {
+        color: rgb(113, 202, 165);
+        background: white;
+    }
+    #Modal .close_button > span span,
+    #Modal .close_button > span::before,
+    #Modal .close_button > span::after {
+        background: rgb(113, 202, 165);
+    }
+
+    #Modal {
+        z-index:10;
+        position:fixed;
+        top:0;
+        left: 105%;
+        width: 70vw;
+        height: 100%;
+        padding: 7rem 2rem 0;
         transition:all 0.3s;
     }
     #Modal.visible {
-        transform: translateX(-100%)
+        transform: translateX(-105%)
     }
     #Modal .close_button {
         position:sticky;
@@ -178,8 +195,7 @@
         height: 5rem;
         float:left;
         border-radius: 2.5rem;
-        color: rgb(113, 202, 165);
-        background: white;
+
     }
         #Modal .close_button > span::before,
         #Modal .close_button > span::after {
@@ -198,7 +214,6 @@
             width: 2rem;
             height: 0.2rem;
             transition: all 0.3s;
-            background: rgb(113, 202, 165);
         }
     #Modal .action{
         display:flex;
