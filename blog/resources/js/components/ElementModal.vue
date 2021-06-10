@@ -31,8 +31,11 @@
             :class="['wrapper' ,this.action == 'create' ? 'create':'edit']"
             v-if="this.action == 'create' || this.action =='edit'"
         >
-            <input v-model="new_title">
-            <textarea v-model="new_content"></textarea>
+            <label for="input_title">TITLE</label>
+            <input id="input_title" v-model="new_title">
+
+            <label for="input_content">CONTENT</label>
+            <textarea id="input_content" v-model="new_content"></textarea>
         </div>
 
         <div
@@ -52,7 +55,7 @@
 </template>
 
 <script>
-    export default {
+    module.exports = {
         props: {
             event_on: Boolean,
             token:String,
@@ -172,6 +175,12 @@
         background: rgb(113, 202, 165);
     }
 
+    #Modal button{
+        background: white;
+        color: rgb(113, 202, 165);
+    }
+
+
     #Modal {
         z-index:10;
         position:fixed;
@@ -195,7 +204,6 @@
         height: 5rem;
         float:left;
         border-radius: 2.5rem;
-
     }
         #Modal .close_button > span::before,
         #Modal .close_button > span::after {
@@ -217,10 +225,15 @@
         }
     #Modal .action{
         display:flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
+
         height:5rem;
-        margin:0 auto;
+
+        padding-left: 3rem;
+
+        font-size: 2rem;
+
         opacity:0;
         transition-delay:1s;
         transition:all 0.3s;
@@ -233,5 +246,46 @@
         align-items:center;
         justify-content:flex-start;
         flex-direction:column;
+
+        width:70%;
+        margin: 0 auto;
     }
+
+    #Modal label{
+        margin-right: auto;
+    }
+
+    #Modal input,
+    #Modal textarea{
+        width: 100%;
+
+        margin-bottom:2.5rem;
+        padding: 0.75rem;
+
+        border:none;
+        border-radius: 0.5rem;
+
+        outline: none;
+    }
+
+    #Modal textarea{
+        resize: none;
+        
+        height: 10rem;  
+    }
+
+    #Modal button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 9rem;
+        height: 3rem;
+
+        margin: 0 auto;
+
+        border: none;
+        border-radius: 1.5rem;
+    }
+
 </style>
