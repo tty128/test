@@ -19,10 +19,12 @@
             </ul>
         </aside>
         <article>
-            <router-view
-             :token="token"
-             :items="items"
-            ></router-view>
+            <keep-alive>
+                <router-view
+                 :token="token"
+                 :items="items"
+                ></router-view>
+            </keep-alive>
         </article>
     </div>
 </template>
