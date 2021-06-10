@@ -1,5 +1,5 @@
 <template>
-    <ul 
+    <ul
         class="radio__limits"
         v-if="limits.length > 1"
     >
@@ -42,13 +42,25 @@
 </script>
 
 <style scoped>
+    .radio__limits .radio__limit label{
+        color: #367678;
+        background: #E6F6D1;
+    }
+
+    .radio__limits .radio__limit input:checked +
+    label{
+        color: #E6F6D1 !important;
+        background: #367678 !important;
+    }
+
+
     .radio__limits input{
         display: none;
     }
 
     .radio__limits{
         list-style: none;
-        
+
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -59,13 +71,19 @@
         padding:0;
     }
 
+
+
     .radio__limits li:nth-child(1) label{
-        width: 3rem;
+        width: 2.75rem;
+        justify-content: flex-end;
+        padding-right: 0.75rem;
         border-radius: 1.25rem 0 0 1.25rem;
     }
 
     .radio__limits li:nth-last-child(1) label{
-        width: 3rem;
+        width: 2.75rem;
+        justify-content: flex-start;
+        padding-left: 0.75rem;
         border-radius: 0 1.25rem 1.25rem 0;
     }
 
@@ -86,15 +104,8 @@
         width: 2.5rem;
         height: 2.5rem;
 
-        color: darkgreen;
-        background: yellowgreen;
-
         transition:all 0.3s;
     }
 
-    .radio__limits .radio__limit input:checked + 
-    label{
-        color: yellowgreen !important;
-        background: darkgreen !important;
-    }
+
 </style>

@@ -2089,6 +2089,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     event_on: Boolean,
@@ -2100,42 +2116,49 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       items: null,
       new_title: null,
-      new_content: null
+      new_content: null,
+      new_status: null
     };
   },
   watch: {
     post_id: function () {
       var _post_id = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var postId, routePath, path, response;
+        var postId, routePath, path, response, element;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 this.new_title = null;
                 this.new_content = null;
+                this.new_status = 'private';
 
-                if (!(this.action === 'create' || this.post_id !== null)) {
-                  _context.next = 12;
+                if (!(this.action !== 'create' || this.post_id !== null)) {
+                  _context.next = 14;
                   break;
                 }
 
                 postId = '/' + this.post_id;
                 routePath = this.$route.path;
                 path = this.$appRootPath + routePath.replace(this.$appPath, this.$appApiPrefix) + postId;
-                _context.next = 8;
+                _context.next = 9;
                 return axios.get(path, {
                   params: {
                     api_token: this.token
                   }
                 });
 
-              case 8:
+              case 9:
                 response = _context.sent;
                 this.items = response.data;
                 this.new_title = this.items.post_title;
                 this.new_content = this.items.post_content;
+                this.new_status = this.items.post_status;
 
-              case 12:
+              case 14:
+                element = document.getElementById('status_' + this.new_status);
+                element.checked = true;
+
+              case 16:
               case "end":
                 return _context.stop();
             }
@@ -2177,9 +2200,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   methods: {
-    changeWait: function changeWait() {
-      return this.items !== null && this.post_id == this.items.post_id;
-    },
     emitAction: function emitAction() {
       this.$emit('element_modal_action', false);
     },
@@ -2187,34 +2207,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var postId = this.action !== 'create' && this.post_id !== null && this.post_id !== 'undefind' ? '/' + this.post_id : '';
       var routePath = this.$route.path;
       var path = this.$appRootPath + routePath.replace(this.$appPath, this.$appApiPrefix) + postId;
+      this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private';
+      var params = {
+        post_title: this.new_title,
+        post_content: this.new_content,
+        post_status: this.new_status
+      };
 
       switch (state) {
         case 'edit':
-          axios.put(path + '?api_token=' + this.token, {
-            post_title: this.new_title,
-            post_content: this.new_content
-          }).then(function () {
-            console.log("put送れたよ");
-          });
+          axios.put(path + '?api_token=' + this.token, params).then(function () {});
           break;
 
         case 'delete':
-          axios["delete"](path + '?api_token=' + this.token).then(function () {
-            console.log("del送れたよ");
-          });
+          axios["delete"](path + '?api_token=' + this.token).then(function () {});
           break;
 
         case 'create':
-          axios.post(path + '?api_token=' + this.token, {
-            post_title: this.new_title,
-            post_content: this.new_content
-          }).then(function () {
-            console.log("送れたよ");
-          });
+          axios.post(path + '?api_token=' + this.token, params).then(function () {});
           break;
 
         default:
-          console.log('cre');
           break;
       }
     }
@@ -2265,14 +2278,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 //
@@ -2328,10 +2333,39 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     token: String,
-    items: Array
+    items: Array,
+    data_name: String
   },
   data: function data() {
     return {
@@ -2343,25 +2377,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       modal_action: null
     };
   },
-  beforeRouteUpdate: function beforeRouteUpdate(to, from, next) {
-    this.current_page = to.query.page;
-    next();
-  },
   computed: {
     currentPage: function currentPage() {
+      // query params['page']が Number ならそのまま取得し、それ以外なら1を返す
       return _typeof(this.$route.query.page) == 'object' || typeof this.$route.query.page === "undefined" ? 1 : Number(this.$route.query.page);
     },
     lastPage: function lastPage() {
+      // 最大ページ数を返す(itemsが存在しない場合は0を返す)
       return this.items == null ? 0 : Math.ceil(this.items.length / this.limit);
     },
-    limitCount: function limitCount() {
+    limitArray: function limitArray() {
+      // 現在ページで表示するitemの配列をリミット数以下で返す
       var current_page = this.currentPage;
       return this.items.slice((current_page - 1) * this.limit, current_page * this.limit);
     }
   },
   methods: {
     elementLimitAction: function elementLimitAction(num) {
-      console.log(num);
+      // Component:PaginateLimitButtonから戻ってきた数値を変数に代入する
       this.limit = num;
     },
     elementCardAction: function elementCardAction() {
@@ -2369,6 +2402,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         arg[_key] = arguments[_key];
       }
 
+      // Component:ElementCardから戻ってきたidおよびaction名を各変数に代入（modalで使用）する
+      // その後、modalを起動
       var id = arg[0],
           action = arg[1];
       this.modal_post_id = id;
@@ -2376,42 +2411,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       this.modal = true;
     },
     elementModalAction: function elementModalAction(modal_switch) {
+      // Component:ElementModalから戻ってきたBoolean（基本false）
+      // Modalで自身を閉じるための関数
       this.modal = modal_switch;
-    },
-    getAPIs: function () {
-      var _getAPIs = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var routePath, path, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                routePath = this.$route.path;
-                path = this.$appRootPath + routePath.replace(this.$appPath, this.$appApiPrefix);
-                _context.next = 4;
-                return axios.get(path, {
-                  params: {
-                    api_token: this.token
-                  }
-                });
-
-              case 4:
-                response = _context.sent;
-                this.items = response.data;
-
-              case 6:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function getAPIs() {
-        return _getAPIs.apply(this, arguments);
-      }
-
-      return getAPIs;
-    }()
+    }
   }
 });
 
@@ -2475,6 +2478,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     token: String
@@ -2483,7 +2489,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       items: null,
       posts: null,
-      terms: null
+      terms: null,
+      data_name: null
     };
   },
   beforeRouteUpdate: function beforeRouteUpdate(to, from, next) {
@@ -2499,6 +2506,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                // 要検討
+                // 結局すべてのresponceを待機することになりPromise.allでawaitする必要性が薄く
+                // 使用頻度の高いと思われるpostを優先して先にawaitし即代入した方がユーザー利便性に優れると思われる
                 path = this.$appRootPath + this.$appApiPrefix;
                 _context.prev = 1;
                 _context.next = 4;
@@ -2557,6 +2567,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return getAPIs;
     }(),
     changeItems: function changeItems($str) {
+      // MainComponentへ渡すitemsの切り替えを行う
+      this.data_name = $str;
+
       switch ($str) {
         case 'post':
           this.items = this.posts;
@@ -2665,6 +2678,9 @@ module.exports = {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+//
+//
+//
 //
 //
 //
@@ -7353,7 +7369,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#Modal[data-v-acc72708] {\n    background: rgb(113, 202, 165);\n    color:white;\n    filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));\n}\n#Modal .close_button[data-v-acc72708] {\n    color: rgb(113, 202, 165);\n    background: white;\n}\n#Modal .close_button > span span[data-v-acc72708],\n#Modal .close_button > span[data-v-acc72708]::before,\n#Modal .close_button > span[data-v-acc72708]::after {\n    background: rgb(113, 202, 165);\n}\n#Modal[data-v-acc72708] {\n    z-index:10;\n    position:fixed;\n    top:0;\n    left: 105%;\n    width: 70vw;\n    height: 100%;\n    padding: 7rem 2rem 0;\n    transition:all 0.3s;\n}\n#Modal.visible[data-v-acc72708] {\n    transform: translateX(-105%)\n}\n#Modal .close_button[data-v-acc72708] {\n    position:sticky;\n    top:2rem;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 5rem;\n    height: 5rem;\n    float:left;\n    border-radius: 2.5rem;\n}\n#Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        content: \"\";\n}\n#Modal .close_button > span[data-v-acc72708]::before {\n        transform: rotate(45deg) translateY(0.7rem);\n}\n#Modal .close_button > span[data-v-acc72708]::after {\n        transform:rotate(-45deg) translateY(-0.7rem);\n}\n#Modal .close_button > span span[data-v-acc72708],\n    #Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        display: block;\n        width: 2rem;\n        height: 0.2rem;\n        transition: all 0.3s;\n}\n#Modal .action[data-v-acc72708]{\n    display:flex;\n    justify-content: center;\n    align-items: center;\n    height:5rem;\n    margin:0 auto;\n    opacity:0;\n    transition-delay:1s;\n    transition:all 0.3s;\n}\n#Modal.visible .action[data-v-acc72708]{\n    opacity:1 !important;\n}\n#Modal .wrapper.create[data-v-acc72708]{\n    display:flex;\n    align-items:center;\n    justify-content:flex-start;\n    flex-direction:column;\n}\n", ""]);
+exports.push([module.i, "\n#Modal[data-v-acc72708] {\n    background: rgb(113, 202, 165);\n    color:white;\n    filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));\n}\n#Modal .close_button[data-v-acc72708] {\n    color: rgb(113, 202, 165);\n    background: white;\n}\n#Modal .close_button > span span[data-v-acc72708],\n#Modal .close_button > span[data-v-acc72708]::before,\n#Modal .close_button > span[data-v-acc72708]::after {\n    background: rgb(113, 202, 165);\n}\n#Modal button[data-v-acc72708]{\n    background: white;\n    color: rgb(113, 202, 165);\n}\n#Modal .input_radio[data-v-acc72708]{\n    background: white;\n}\n#Modal label.input_status[data-v-acc72708]{\n    background: white;\n    color: rgb(113, 202, 165);\n}\n#Modal input#status_private:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(202, 113, 113) !important;\n}\n#Modal input#status_member:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(202, 193, 113) !important;\n}\n#Modal input#status_public:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(113, 202, 165) !important;\n}\n#Modal[data-v-acc72708] {\n    z-index:10;\n    overflow-y: auto;\n\n    position:fixed;\n    top:0;\n    bottom:0;\n    left: 105%;\n\n    width: 70vw;\n    height: 100%;\n\n    padding: 7rem 2rem 0;\n    transition:all 0.3s;\n}\n#Modal.visible[data-v-acc72708] {\n    transform: translateX(-105%)\n}\n#Modal.invisible[data-v-acc72708]{\n    opacity: 0 !important;\n}\n#Modal .close_button[data-v-acc72708] {\n    position:sticky;\n    top:2rem;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 5rem;\n    height: 5rem;\n    float:left;\n    border-radius: 2.5rem;\n}\n#Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        content: \"\";\n}\n#Modal .close_button > span[data-v-acc72708]::before {\n        transform: rotate(45deg) translateY(0.7rem);\n}\n#Modal .close_button > span[data-v-acc72708]::after {\n        transform:rotate(-45deg) translateY(-0.7rem);\n}\n#Modal .close_button > span span[data-v-acc72708],\n    #Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        display: block;\n        width: 2rem;\n        height: 0.2rem;\n        transition: all 0.3s;\n}\n#Modal .action[data-v-acc72708]{\n\n    display:flex;\n    justify-content: flex-start;\n    align-items: center;\n\n    height:5rem;\n\n    padding-left: 2rem;\n\n    font-family: 'Nunito';\n    font-size: 4rem;\n    font-weight: 900;\n\n    opacity:0;\n    transition-delay:1s;\n    transition:all 0.3s;\n}\n#Modal.visible .action[data-v-acc72708]{\n    opacity:1 !important;\n}\n#Modal .wrapper[data-v-acc72708]{\n    display:flex;\n    align-items:center;\n    justify-content:flex-start;\n    flex-direction:column;\n\n    width:70%;\n    margin: 0 auto;\n}\n\n/* #Modal label{\n    margin-right: auto;\n} */\n#Modal input#input_title[data-v-acc72708],\n#Modal textarea[data-v-acc72708]{\n    width: 100%;\n\n    margin-bottom:2.5rem;\n    padding: 0.75rem;\n\n    border:none;\n    border-radius: 0.5rem;\n\n    outline: none;\n}\n#Modal textarea[data-v-acc72708]{\n    resize: none;\n\n    height: 15rem;\n}\n#Modal button[data-v-acc72708]{\n    display: flex;\n    align-items: center;\n    justify-content: center;\n\n    width: 9rem;\n    height: 3rem;\n\n    margin: 0 auto;\n    margin-bottom: 5rem;\n\n    border: none;\n    border-radius: 1.5rem;\n}\n#Modal input[id^='status_'][data-v-acc72708]{\n    display: none;\n}\n#Modal .input_radio[data-v-acc72708],\n#Modal .input_status[data-v-acc72708] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n#Modal .input_radio[data-v-acc72708]{\n    padding: 0.25rem;\n    border-radius: 0.5rem;\n    margin-bottom: 2.5rem;\n}\n#Modal label.input_status[data-v-acc72708]{\n    -webkit-user-select: none;\n       -moz-user-select: none;\n        -ms-user-select: none;\n            user-select: none;\n    cursor: pointer;\n\n    width: 5rem;\n    height: 2rem;\n    margin: 0;\n    border-radius: 0.5rem;\n\n    transition:all 0.3s;\n}\n\n\n", ""]);
 
 // exports
 
@@ -7372,7 +7388,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nsection[data-v-b9c20fb8] {\n    transition: all 0.5s;\n}\nsection .post_create[data-v-b9c20fb8] {\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 20rem;\n    height: 4rem;\n    margin: 1rem auto;\n    font-size:1.3rem;\n    color: white;\n    border-radius: 2rem;\n    background: #367678;\n    transition: all 0.2s;\n}\nsection .post_create[data-v-b9c20fb8]:hover {\n\n        transform: scale(1.01);\n        filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));\n}\nsection .post_all[data-v-b9c20fb8] {\n    list-style: none;\n\n    display: flex;\n    align-items: flex-start;\n    justify-content: center;\n    flex-wrap: wrap;\n\n    width: 100%;\n    height: auto;\n\n    margin: 0px auto;\n    padding: 0px;\n}\n\n", ""]);
+exports.push([module.i, "\nsection[data-v-b9c20fb8] {\n    width: 90%;\n    margin: 0 auto;\n    transition: all 0.5s;\n}\nsection .create[data-v-b9c20fb8] {\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 20rem;\n    height: 4rem;\n    margin: 1rem auto;\n    font-size:1.3rem;\n    color: white;\n    border-radius: 2rem;\n    background: #367678;\n    transition: all 0.2s;\n}\nsection .create[data-v-b9c20fb8]:hover {\n\n        transform: scale(1.01);\n        filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));\n}\nsection .item_all[data-v-b9c20fb8] {\n    list-style: none;\n\n    display: flex;\n    align-items: flex-start;\n    justify-content: center;\n    flex-wrap: wrap;\n\n    width: 100%;\n    height: auto;\n\n    margin: 0px auto;\n    padding: 0px;\n}\n\n", ""]);
 
 // exports
 
@@ -7429,7 +7445,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.radio__limits input[data-v-484894bb]{\n    /* display: none; */\n}\n", ""]);
+exports.push([module.i, "\n.radio__limits .radio__limit label[data-v-484894bb]{\n    color: #367678;\n    background: #E6F6D1;\n}\n.radio__limits .radio__limit input:checked +\nlabel[data-v-484894bb]{\n    color: #E6F6D1 !important;\n    background: #367678 !important;\n}\n.radio__limits input[data-v-484894bb]{\n    display: none;\n}\n.radio__limits[data-v-484894bb]{\n    list-style: none;\n\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n\n    width:100%;\n\n    margin: 0.5rem 0;\n    padding:0;\n}\n.radio__limits li:nth-child(1) label[data-v-484894bb]{\n    width: 2.75rem;\n    justify-content: flex-end;\n    padding-right: 0.75rem;\n    border-radius: 1.25rem 0 0 1.25rem;\n}\n.radio__limits li:nth-last-child(1) label[data-v-484894bb]{\n    width: 2.75rem;\n    justify-content: flex-start;\n    padding-left: 0.75rem;\n    border-radius: 0 1.25rem 1.25rem 0;\n}\n.radio__limits .radio__limit[data-v-484894bb]{\n    margin: 0;\n    margin-left: 0.15rem ;\n    padding:0;\n}\n.radio__limits .radio__limit label[data-v-484894bb]{\n    -webkit-user-select: none;\n       -moz-user-select: none;\n        -ms-user-select: none;\n            user-select: none;\n    cursor: pointer;\n\n    display: flex;\n    align-items: center;\n    justify-content: center;\n\n    width: 2.5rem;\n    height: 2.5rem;\n\n    transition:all 0.3s;\n}\n\n\n", ""]);
 
 // exports
 
@@ -40332,13 +40348,11 @@ var render = function() {
         [_c("span")]
       ),
       _vm._v(" "),
-      this.action == "create" || _vm.changeWait()
-        ? _c("h2", { staticClass: "action" }, [
-            _vm._v("\n        " + _vm._s(_vm.action.toUpperCase()) + "\n    ")
-          ])
-        : _vm._e(),
+      _c("h2", { staticClass: "action" }, [
+        _vm._v("\n        " + _vm._s(_vm.action.toUpperCase()) + "\n    ")
+      ]),
       _vm._v(" "),
-      this.action != "create" && _vm.changeWait()
+      this.action != "create"
         ? _c("div", { staticClass: "wrapper" }, [
             _c("h3", [_vm._v(_vm._s(_vm.items.post_title))]),
             _vm._v(" "),
@@ -40351,6 +40365,8 @@ var render = function() {
             "div",
             { class: ["wrapper", this.action == "create" ? "create" : "edit"] },
             [
+              _c("label", { attrs: { for: "input_title" } }, [_vm._v("TITLE")]),
+              _vm._v(" "),
               _c("input", {
                 directives: [
                   {
@@ -40360,6 +40376,7 @@ var render = function() {
                     expression: "new_title"
                   }
                 ],
+                attrs: { id: "input_title", required: "" },
                 domProps: { value: _vm.new_title },
                 on: {
                   input: function($event) {
@@ -40371,6 +40388,10 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
+              _c("label", { attrs: { for: "input_content" } }, [
+                _vm._v("CONTENT")
+              ]),
+              _vm._v(" "),
               _c("textarea", {
                 directives: [
                   {
@@ -40380,6 +40401,7 @@ var render = function() {
                     expression: "new_content"
                   }
                 ],
+                attrs: { id: "input_content", required: "" },
                 domProps: { value: _vm.new_content },
                 on: {
                   input: function($event) {
@@ -40389,16 +40411,123 @@ var render = function() {
                     _vm.new_content = $event.target.value
                   }
                 }
-              })
+              }),
+              _vm._v(" "),
+              _c("label", [_vm._v("STATUS")]),
+              _vm._v(" "),
+              _c("div", { staticClass: "input_radio" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.new_status,
+                      expression: "new_status"
+                    }
+                  ],
+                  attrs: {
+                    type: "radio",
+                    id: "status_private",
+                    value: "private"
+                  },
+                  domProps: { checked: _vm._q(_vm.new_status, "private") },
+                  on: {
+                    change: function($event) {
+                      _vm.new_status = "private"
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "input_status",
+                    attrs: { for: "status_private" }
+                  },
+                  [_vm._v("Private")]
+                ),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.new_status,
+                      expression: "new_status"
+                    }
+                  ],
+                  attrs: {
+                    type: "radio",
+                    id: "status_member",
+                    value: "member"
+                  },
+                  domProps: { checked: _vm._q(_vm.new_status, "member") },
+                  on: {
+                    change: function($event) {
+                      _vm.new_status = "member"
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "input_status",
+                    attrs: { for: "status_member" }
+                  },
+                  [_vm._v("Member")]
+                ),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.new_status,
+                      expression: "new_status"
+                    }
+                  ],
+                  attrs: {
+                    type: "radio",
+                    id: "status_public",
+                    value: "public"
+                  },
+                  domProps: { checked: _vm._q(_vm.new_status, "public") },
+                  on: {
+                    change: function($event) {
+                      _vm.new_status = "public"
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "input_status",
+                    attrs: { for: "status_public" }
+                  },
+                  [_vm._v("Public")]
+                )
+              ])
             ]
           )
         : _vm._e(),
       _vm._v(" "),
-      this.action == "delete" || this.action == "preview"
+      this.action == "preview"
         ? _c("div", {
-            class: ["wrapper", this.action == "create" ? "create" : "edit"],
+            staticClass: "wrapper preview",
             domProps: { innerHTML: _vm._s(_vm.new_content) }
           })
+        : _vm._e(),
+      _vm._v(" "),
+      this.action == "delete"
+        ? _c("div", { staticClass: "wrapper delete" }, [
+            _c("p", [
+              _vm._v(
+                "この記事を消去します。消した記事はゴミ箱より復帰することが出来ます。"
+              )
+            ])
+          ])
         : _vm._e(),
       _vm._v(" "),
       this.action != "preview"
@@ -40492,14 +40621,20 @@ var render = function() {
       _c(
         "div",
         {
-          staticClass: "post_create",
+          staticClass: "create",
           on: {
             click: function($event) {
               return _vm.elementCardAction(null, "create")
             }
           }
         },
-        [_vm._v("\n        Create New Post\n    ")]
+        [
+          _vm._v(
+            "\n        Create New " +
+              _vm._s(_vm.data_name.toUpperCase()) +
+              "\n    "
+          )
+        ]
       ),
       _vm._v(" "),
       _c("laravel-pagination-limit", {
@@ -40515,30 +40650,58 @@ var render = function() {
         }
       }),
       _vm._v(" "),
-      _c(
-        "ul",
-        { staticClass: "post_all" },
-        _vm._l(_vm.limitCount, function(item) {
-          return _c(
-            "li",
-            { key: item.post_id, staticClass: "post_body" },
-            [
-              _c("laravel-element-card", {
-                attrs: {
-                  created_at: item.created_at,
-                  updated_at: item.updated_at,
-                  status: item.post_status,
-                  name: item.post_title,
-                  id: item.post_id
-                },
-                on: { element_card_action: _vm.elementCardAction }
-              })
-            ],
-            1
+      _vm.data_name == "post"
+        ? _c(
+            "ul",
+            { staticClass: "item_all" },
+            _vm._l(_vm.limitArray, function(item) {
+              return _c(
+                "li",
+                { key: item.post_id, staticClass: "item_body" },
+                [
+                  _c("laravel-element-card", {
+                    attrs: {
+                      created_at: item.created_at,
+                      updated_at: item.updated_at,
+                      status: item.post_status,
+                      name: item.post_title,
+                      id: item.post_id
+                    },
+                    on: { element_card_action: _vm.elementCardAction }
+                  })
+                ],
+                1
+              )
+            }),
+            0
           )
-        }),
-        0
-      ),
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.data_name == "term"
+        ? _c(
+            "ul",
+            { staticClass: "item_all" },
+            _vm._l(_vm.limitArray, function(item) {
+              return _c(
+                "li",
+                { key: item.post_id, staticClass: "item_body" },
+                [
+                  _c("laravel-element-card", {
+                    attrs: {
+                      created_at: item.created_at,
+                      updated_at: item.updated_at,
+                      name: item.term_name,
+                      id: item.term_id
+                    },
+                    on: { element_card_action: _vm.elementCardAction }
+                  })
+                ],
+                1
+              )
+            }),
+            0
+          )
+        : _vm._e(),
       _vm._v(" "),
       _c("laravel-pagination", {
         attrs: {
@@ -40620,7 +40783,21 @@ var render = function() {
     _vm._v(" "),
     _c(
       "article",
-      [_c("router-view", { attrs: { token: _vm.token, items: _vm.items } })],
+      [
+        _c(
+          "keep-alive",
+          [
+            _c("router-view", {
+              attrs: {
+                token: _vm.token,
+                items: _vm.items,
+                data_name: _vm.data_name
+              }
+            })
+          ],
+          1
+        )
+      ],
       1
     )
   ])
@@ -40751,39 +40928,43 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "ul",
-    { staticClass: "radio__limits" },
-    _vm._l(_vm.limits.length, function(n) {
-      return _c("li", { key: n, staticClass: "radio__limit" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.input_limit,
-              expression: "input_limit"
-            }
-          ],
-          attrs: { type: "radio", name: "limit", id: "limit-" + n },
-          domProps: {
-            value: _vm.limits[n - 1],
-            checked: _vm._q(_vm.input_limit, _vm.limits[n - 1])
-          },
-          on: {
-            change: function($event) {
-              _vm.input_limit = _vm.limits[n - 1]
-            }
-          }
+  return _vm.limits.length > 1
+    ? _c(
+        "ul",
+        { staticClass: "radio__limits" },
+        _vm._l(_vm.limits.length, function(n) {
+          return _c("li", { key: n, staticClass: "radio__limit" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.input_limit,
+                  expression: "input_limit"
+                }
+              ],
+              attrs: { type: "radio", name: "limit", id: "limit-" + n },
+              domProps: {
+                value: _vm.limits[n - 1],
+                checked: _vm._q(_vm.input_limit, _vm.limits[n - 1])
+              },
+              on: {
+                change: function($event) {
+                  _vm.input_limit = _vm.limits[n - 1]
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c("label", { attrs: { for: "limit-" + n } }, [
+              _vm._v(
+                "\n            " + _vm._s(_vm.limits[n - 1]) + "\n        "
+              )
+            ])
+          ])
         }),
-        _vm._v(" "),
-        _c("label", { attrs: { for: "limit-" + n } }, [
-          _vm._v("\n            " + _vm._s(_vm.limits[n - 1]) + "\n        ")
-        ])
-      ])
-    }),
-    0
-  )
+        0
+      )
+    : _vm._e()
 }
 var staticRenderFns = []
 render._withStripped = true

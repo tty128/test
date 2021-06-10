@@ -1,10 +1,11 @@
 <template>
     <section>
+        <!-- PageTop UI -->
         <div
-             class="post_create"
+             class="create"
              @click ="elementCardAction(null,'create')"
         >
-            Create New Post
+            Create New {{ data_name.toUpperCase() }}
         </div>
 
         <laravel-pagination-limit
@@ -17,12 +18,16 @@
             :current_page="currentPage"
             :max_view_pages="paginate_max_pages"
         ></laravel-pagination>
+        <!-- PageTop UI End -->
 
-        <ul class='post_all'>
+        <!-- itemBody -->
+        <ul class='item_all'
+            v-if="data_name == 'post'"
+        >
             <li
-                v-for="item in limitCount"
+                v-for="item in limitArray"
                 :key="item.post_id"
-                class="post_body"
+                class="item_body"
             >
                 <laravel-element-card
                     @element_card_action="elementCardAction"
@@ -35,12 +40,34 @@
             </li>
         </ul>
 
+        <ul class='item_all'
+            v-if="data_name == 'term'"
+        >
+            <li
+                v-for="item in limitArray"
+                :key="item.post_id"
+                class="item_body"
+            >
+                <laravel-element-card
+                    @element_card_action="elementCardAction"
+                    :created_at = "item.created_at"
+                    :updated_at = "item.updated_at"
+                    :name = "item.term_name"
+                    :id = "item.term_id"
+                ></laravel-element-card>
+            </li>
+        </ul>
+        <!-- itemBody End-->
+
+        <!-- PageFooter UI -->
         <laravel-pagination
             :last_page="lastPage"
             :current_page="currentPage"
             :max_view_pages="paginate_max_pages"
         ></laravel-pagination>
+        <!-- PageFooter UI End -->
 
+        <!-- Fixed Element -->
         <laravel-modal
             @element_modal_action="elementModalAction"
             :event_on="modal"
@@ -48,6 +75,7 @@
             :action="modal_action"
             :post_id="modal_post_id"
         ></laravel-modal>
+        <!-- Fixed Element End -->
     </section>
 </template>
 
@@ -57,6 +85,7 @@
         props: {
             token: String,
             items: Array,
+            data_name:String
         },
         data: function () {
             return {
@@ -68,28 +97,29 @@
                 modal_action:null,
             }
         },
-        beforeRouteUpdate(to, from, next) {
-            this.current_page = to.query.page
-            next()
-        },
         computed:{
             currentPage:function(){
+                // query params['page']が Number ならそのまま取得し、それ以外なら1を返す
                 return (typeof(this.$route.query.page) == 'object' || typeof(this.$route.query.page) === "undefined") ? 1 : Number(this.$route.query.page)
             },
             lastPage:function(){
+                // 最大ページ数を返す(itemsが存在しない場合は0を返す)
                 return this.items == null ? 0 : Math.ceil(this.items.length / this.limit)
             },
-            limitCount:function(){
+            limitArray:function(){
+                // 現在ページで表示するitemの配列をリミット数以下で返す
                 let current_page = this.currentPage
                 return this.items.slice( (current_page - 1) * this.limit , current_page * this.limit )
             },
         },
         methods: {
             elementLimitAction:function(num){
-                console.log(num)
+                // Component:PaginateLimitButtonから戻ってきた数値を変数に代入する
                 this.limit = num
             },
             elementCardAction: function(...arg){
+                // Component:ElementCardから戻ってきたidおよびaction名を各変数に代入（modalで使用）する
+                // その後、modalを起動
                 let [id, action] = arg
                 this.modal_post_id=id
                 this.modal_action=action
@@ -97,21 +127,11 @@
                 this.modal = true
             },
             elementModalAction:function (modal_switch){
+                // Component:ElementModalから戻ってきたBoolean（基本false）
+                // Modalで自身を閉じるための関数
                 this.modal = modal_switch
             },
-            getAPIs:async function () {
-                let routePath = this.$route.path
-                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix)
 
-                const response = await axios
-                    .get(path ,{params:
-                        {
-                            api_token:this.token
-                        }
-                    })
-
-                this.items = response.data
-            }
         }
 
     }
@@ -119,10 +139,12 @@
 
 <style scoped>
     section {
+        width: 90%;
+        margin: 0 auto;
         transition: all 0.5s;
     }
 
-    section .post_create {
+    section .create {
         backface-visibility: hidden;
         cursor: pointer;
         display: flex;
@@ -138,13 +160,13 @@
         transition: all 0.2s;
     }
 
-        section .post_create:hover {
+        section .create:hover {
 
             transform: scale(1.01);
             filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
         }
 
-    section .post_all {
+    section .item_all {
         list-style: none;
 
         display: flex;

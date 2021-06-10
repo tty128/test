@@ -23,6 +23,7 @@
                 <router-view
                  :token="token"
                  :items="items"
+                 :data_name="data_name"
                 ></router-view>
             </keep-alive>
         </article>
@@ -40,6 +41,7 @@
                 items:null,
                 posts:null,
                 terms:null,
+                data_name:null,
             }
         },
         beforeRouteUpdate(to, from, next) {
@@ -48,6 +50,10 @@
         },
         methods: {
             getAPIs:async function () {
+                // 要検討
+                // 結局すべてのresponceを待機することになりPromise.allでawaitする必要性が薄く
+                // 使用頻度の高いと思われるpostを優先して先にawaitし即代入した方がユーザー利便性に優れると思われる
+
                 let path = this.$appRootPath + this.$appApiPrefix
 
                 let res1,res2
@@ -80,6 +86,8 @@
                 }
             },
             changeItems:function($str){
+                // MainComponentへ渡すitemsの切り替えを行う
+                this.data_name = $str
                 switch($str){
                     case 'post':
                         this.items=this.posts
