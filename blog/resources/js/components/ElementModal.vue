@@ -3,64 +3,86 @@
         id="Modal"
         :class="event_on ? 'visible' : ''"
     >
+        <!-- CloseButton -->
         <div
             class="close_button"
             @click="emitAction"
         >
             <span></span>
         </div>
+        <!-- CloseButton End -->
 
+        <!-- ActionString -->
         <h2 class="action">
             {{ action.toUpperCase() }}
         </h2>
+        <!-- ActionString -->
 
+        <!-- ItemTitle -->
         <div
             class="wrapper"
-            v-if="this.action != 'create'"
+            v-if="action !== 'create'"
         >
-            <h3>{{ items.post_title }}</h3>
-            <div>
-
-            </div>
+            <h3>{{ old_title }}</h3>
         </div>
-        <div
-            :class="['wrapper' ,this.action == 'create' ? 'create':'edit']"
-            v-if="this.action == 'create' || this.action =='edit'"
-        >
-            <label for="input_title">TITLE</label>
-            <input id="input_title" v-model="new_title" required>
+        <!-- ItemTitle End -->
 
+        <!-- ItemNewParam Input:create and edit action-->
+        <div
+            :class="['wrapper' ,action == 'create' ? 'create':'edit']"
+            v-if="action == 'create' || action =='edit'"
+        >
+            <div
+                v-if="new_title !== null"
+            >
+                <label for="input_title">TITLE</label>
+                <input id="input_title" v-model="new_title" required>
+            </div>
+
+            <div
+                v-if="new_content !== null"
+            >
             <label for="input_content">CONTENT</label>
             <textarea id="input_content" v-model="new_content" required></textarea>
+            </div>
 
-            <label>STATUS</label>
-            <div class="input_radio">
-                <input type="radio" id="status_private" value="private" v-model="new_status">
-                <label class="input_status" for="status_private">Private</label>
-                <input type="radio" id="status_member" value="member" v-model="new_status">
-                <label class="input_status" for="status_member">Member</label>
-                <input type="radio" id="status_public" value="public" v-model="new_status">
-                <label class="input_status" for="status_public">Public</label>
+            <div
+                v-if="new_status !== null"
+            >
+                <label>STATUS</label>
+                <div class="input_radio">
+                    <input type="radio" id="status_private" value="private" v-model="new_status" required>
+                    <label class="input_status" for="status_private">Private</label>
+                    <input type="radio" id="status_member" value="member" v-model="new_status">
+                    <label class="input_status" for="status_member">Member</label>
+                    <input type="radio" id="status_public" value="public" v-model="new_status">
+                    <label class="input_status" for="status_public">Public</label>
+                </div>
             </div>
         </div>
+        <!-- ItemNewParam Input End -->
 
+        <!-- Preview:preview action -->
         <div
             class="wrapper preview"
-            v-if="this.action =='preview'"
+            v-if="action =='preview'"
             v-html="new_content"
         >
         </div>
+        <!-- Preview End -->
 
+        <!-- Delete:delete action -->
         <div
             class="wrapper delete"
-            v-if="this.action == 'delete'"
+            v-if="action == 'delete'"
         >
             <p>この記事を消去します。消した記事はゴミ箱より復帰することが出来ます。</p>
         </div>
+        <!-- Delete End -->
 
         <button
             @click="sendAPIs(action)"
-            v-if="this.action != 'preview'"
+            v-if="action != 'preview'"
         >
             submit
         </button>
@@ -68,41 +90,66 @@
 </template>
 
 <script>
-    export default {
+    module.exports = {
         props: {
             event_on: Boolean,
             token:String,
             action:String,
-            post_id:Number,
+            data_id:Number,
+            data_name:String,
         },
         data:function(){
             return {
                 items:null,
+                old_title:null,
                 new_title:null,
                 new_content:null,
                 new_status:null,
+                res:{
+                    status:null,
+                    message:null,
+                },
             }
         },
         watch:{
-            post_id:async function(){
-                this.new_title = null
-                this.new_content = null
-                this.new_status = 'private'
-                if(this.action !== 'create' || this.post_id !== null){
-                    let postId = '/' + this.post_id
-                    let routePath = this.$route.path
-                    let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + postId
-                    const response = await axios.get(path ,{params:{api_token:this.token}})
-                    this.items = response.data
-                    this.new_title = this.items.post_title
-                    this.new_content = this.items.post_content
-                    this.new_status = this.items.post_status
-                }
-                let element = document.getElementById('status_' + this.new_status)
-                element.checked = true
+            data_id:async function(){
+                // data_idを監視し正常に値が代入されたタイミングで起動
+                // Param初期値を代入
 
+                if(this.action !== 'create' || this.data_id !== null){
+                    // create以外の時のaxios通信
+                    let data_slug = '/' + this.data_id
+                    let routePath = this.$route.path
+                    let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_slug
+                    try{
+                        const response = await axios.get(path ,{params:{api_token:this.token}})
+                        this.items = response.data
+
+                        switch(this.data_name){
+                            case 'post':
+                                this.new_title = this.old_title = this.items.post_title
+                                this.new_content = this.items.post_content
+                                this.new_status = this.items.post_status
+                                break;
+                            case 'term':
+                                this.new_title = this.old_title = this.term_name
+                        } 
+                    }
+                    catch(error){
+                        this.errorInsert(error.response)
+                    }
+
+                }
+
+                // statusがnullではないなら初期値を:checkedする
+                if(this.new_status !== null){
+                    let element = document.getElementById('status_' + this.new_status)
+                    element.checked = true
+                }
             },
             event_on : function(){
+                // Modalの起動を監視し、trueならページの現在値を固定、falseならパラメータを削除する
+                // createdではfalseを拾えないため監視
                 const sbar = window.scrollbars.visible
                 const bs = document.body.style
                 if(this.event_on){
@@ -130,42 +177,79 @@
             emitAction: function () {
                 this.$emit('element_modal_action', false )
             },
-            sendAPIs: function( state ){
-                let postId = this.action !== 'create' && this.post_id !== null && this.post_id !=='undefind' ? '/' + this.post_id : '';
+            sendAPIs:async function( state ){
+                // actionにより異なったリクエストを送信する
+                let data_id = this.action !== 'create' && this.data_id !== null && this.data_id !=='undefind' ? '/' + this.data_id : '';
                 let routePath = this.$route.path
-                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + postId
+                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_id
 
-                this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private'
+                let params 
+                switch(this.data_name){
+                    case 'post':
+                        // laravelでもvalidateしているがここでも想定外のstatusをprivate
+                        this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private'
+                        params = {
+                            post_title:this.new_title,
+                            post_content:this.new_content,
+                            post_status:this.new_status,
+                        }
+                        break;
 
-                let params = {
-                    post_title:this.new_title,
-                    post_content:this.new_content,
-                    post_status:this.new_status,
+                    case 'term':
+                        params = {
+                            post_title:this.new_title,
+                        }
+                        break;
                 }
 
-                switch(state){
-                    case 'edit':
-                        axios
-                            .put(path+'?api_token='+this.token,params)
-                            .then(()=>{
-                            })
+                let res 
+                try{
+                    switch(state){
+                        case 'edit':
+                            res = await axios.put(path+'?api_token='+this.token,params)
+                            break;
+                        case 'delete':
+                            res = await axios.delete(path+'?api_token='+this.token)
+                            break;
+                        case 'create':
+                            res = await axios.post(path+'?api_token='+this.token,params)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch(error){
+                    this.errorInsert(error.response)
+                }
+                
+            },
+            errorInsert:function(error){
+                const {
+                    status,
+                    statusText
+                } = error
+
+                this.res.status = status
+                this.res.message = statusText
+                console.log(this.res.status,this.res.message)
+            }
+        },
+        created:function(){
+            this.new_status = 'private'
+            if(this.action === 'create'){
+                switch(this.data_name){
+                    case 'post':
+                        this.new_title = ""
+                        this.new_content = ""
+                        this.new_status = 'private'
                         break;
-                    case 'delete':
-                        axios
-                            .delete(path+'?api_token='+this.token)
-                            .then(()=>{
-                            })
-                        break;
-                    case 'create':
-                        axios
-                            .post(path+'?api_token='+this.token,params)
-                            .then(()=>{
-                            })
-                        break;
-                    default:
+                    case 'term':
+                        this.new_title = ""
+                        this.new_status = null
                         break;
                 }
             }
+                
         }
     }
 </script>
