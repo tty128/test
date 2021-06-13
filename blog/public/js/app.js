@@ -2105,41 +2105,87 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     event_on: Boolean,
     token: String,
     action: String,
-    post_id: Number
+    data_id: Number,
+    data_name: String
   },
   data: function data() {
     return {
       items: null,
-      new_title: null,
-      new_content: null,
-      new_status: null
+      old_title: null,
+      new_title: '',
+      new_content: '',
+      new_status: 'private',
+      res: {
+        status: null,
+        message: null
+      }
     };
   },
+  computed: {
+    getTitle: function getTitle() {
+      return this.new_title;
+    },
+    getContent: function getContent() {
+      return this.new_content;
+    },
+    getStatus: function getStatus() {
+      return this.new_status;
+    }
+  },
   watch: {
-    post_id: function () {
-      var _post_id = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var postId, routePath, path, response, element;
+    data_id: function () {
+      var _data_id = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var path, response, element;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                // data_idを監視し正常に値が代入されたタイミングで起動
+                // Param初期値を代入
+                // Modalのインスタンスを使いまわす関係上一度しか実行されないcreatedやmountedにはかかずに
+                // idの変更のみを監視とし同一idの別の処理（特にpreview）を高速起動させたい
+                this.old_title = 'Now loading...';
                 this.new_title = null;
                 this.new_content = null;
-                this.new_status = 'private';
+                this.new_status = this.data_name === 'post' ? 'private' : null;
 
-                if (!(this.action !== 'create' || this.post_id !== null)) {
-                  _context.next = 14;
+                if (!(this.action !== 'create' || this.data_id !== null)) {
+                  _context.next = 19;
                   break;
                 }
 
-                postId = '/' + this.post_id;
-                routePath = this.$route.path;
-                path = this.$appRootPath + routePath.replace(this.$appPath, this.$appApiPrefix) + postId;
+                // create以外の時のaxios通信
+                path = this.getAPIsPath();
+                _context.prev = 6;
                 _context.next = 9;
                 return axios.get(path, {
                   params: {
@@ -2150,29 +2196,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 9:
                 response = _context.sent;
                 this.items = response.data;
-                this.new_title = this.items.post_title;
-                this.new_content = this.items.post_content;
-                this.new_status = this.items.post_status;
+                this.notCreatedAction();
+                _context.next = 17;
+                break;
 
               case 14:
-                element = document.getElementById('status_' + this.new_status);
-                element.checked = true;
+                _context.prev = 14;
+                _context.t0 = _context["catch"](6);
+                this.errorInsert(_context.t0.response);
 
-              case 16:
+              case 17:
+                _context.next = 20;
+                break;
+
+              case 19:
+                this.createdAction();
+
+              case 20:
+                // statusがnullではないなら初期値を:checkedする
+                if (this.new_status !== null) {
+                  element = document.getElementById('status_' + this.new_status);
+                  element.checked = true;
+                }
+
+              case 21:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this);
+        }, _callee, this, [[6, 14]]);
       }));
 
-      function post_id() {
-        return _post_id.apply(this, arguments);
+      function data_id() {
+        return _data_id.apply(this, arguments);
       }
 
-      return post_id;
+      return data_id;
     }(),
     event_on: function event_on() {
+      // Modalの起動を監視し、trueならページの現在値を固定、falseならパラメータを削除する
+      // createdではfalseを拾えないため監視
       var sbar = window.scrollbars.visible;
       var bs = document.body.style;
 
@@ -2203,34 +2266,149 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     emitAction: function emitAction() {
       this.$emit('element_modal_action', false);
     },
-    sendAPIs: function sendAPIs(state) {
-      var postId = this.action !== 'create' && this.post_id !== null && this.post_id !== 'undefind' ? '/' + this.post_id : '';
+    getAPIsPath: function getAPIsPath() {
+      var data_id = this.action !== 'create' && this.$isSetable(this.data_id) ? '/' + this.data_id : '';
       var routePath = this.$route.path;
-      var path = this.$appRootPath + routePath.replace(this.$appPath, this.$appApiPrefix) + postId;
-      this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private';
-      var params = {
-        post_title: this.new_title,
-        post_content: this.new_content,
-        post_status: this.new_status
-      };
+      var path = this.$appRootPath + routePath.replace(this.$appPath, this.$appApiPrefix) + data_id;
+      return path;
+    },
+    createdAction: function createdAction() {
+      if (this.action === 'create') {
+        switch (this.data_name) {
+          case 'post':
+            this.new_title = '';
+            this.new_content = '';
+            this.new_status = 'private';
+            break;
 
-      switch (state) {
-        case 'edit':
-          axios.put(path + '?api_token=' + this.token, params).then(function () {});
-          break;
+          case 'term':
+            this.new_title = '';
+            break;
 
-        case 'delete':
-          axios["delete"](path + '?api_token=' + this.token).then(function () {});
-          break;
-
-        case 'create':
-          axios.post(path + '?api_token=' + this.token, params).then(function () {});
-          break;
-
-        default:
-          break;
+          default:
+            break;
+        }
       }
+    },
+    notCreatedAction: function notCreatedAction() {
+      switch (this.data_name) {
+        case 'post':
+          this.new_title = this.old_title = this.items.post_title;
+          this.new_content = this.items.post_content;
+          this.new_status = this.items.post_status;
+          break;
+
+        case 'term':
+          this.new_title = this.old_title = this.term_name;
+      }
+    },
+    sendAPIs: function () {
+      var _sendAPIs = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(state) {
+        var path, params, res;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.prev = 0;
+                path = this.getAPIsPath();
+                _context2.t0 = this.data_name;
+                _context2.next = _context2.t0 === 'post' ? 5 : _context2.t0 === 'term' ? 10 : 12;
+                break;
+
+              case 5:
+                if (!(this.new_title === "" || this.new_title === "")) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                throw new ContentEmpty();
+
+              case 7:
+                // laravelでもvalidateしているがここでも想定外のstatusをデフォルトの値に修正する
+                this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private';
+                params = {
+                  post_title: this.new_title,
+                  post_content: this.new_content,
+                  post_status: this.new_status
+                };
+                return _context2.abrupt("break", 12);
+
+              case 10:
+                params = {
+                  post_title: this.new_title
+                };
+                return _context2.abrupt("break", 12);
+
+              case 12:
+                _context2.t1 = state;
+                _context2.next = _context2.t1 === 'edit' ? 15 : _context2.t1 === 'delete' ? 19 : _context2.t1 === 'create' ? 23 : 27;
+                break;
+
+              case 15:
+                _context2.next = 17;
+                return axios.put(path + '?api_token=' + this.token, params);
+
+              case 17:
+                res = _context2.sent;
+                return _context2.abrupt("break", 28);
+
+              case 19:
+                _context2.next = 21;
+                return axios["delete"](path + '?api_token=' + this.token);
+
+              case 21:
+                res = _context2.sent;
+                return _context2.abrupt("break", 28);
+
+              case 23:
+                _context2.next = 25;
+                return axios.post(path + '?api_token=' + this.token, params);
+
+              case 25:
+                res = _context2.sent;
+                return _context2.abrupt("break", 28);
+
+              case 27:
+                return _context2.abrupt("break", 28);
+
+              case 28:
+                _context2.next = 33;
+                break;
+
+              case 30:
+                _context2.prev = 30;
+                _context2.t2 = _context2["catch"](0);
+
+                if (_context2.t2 instanceof ContentEmpty) {
+                  this.errorInsert([700, '空の項目があります。']);
+                } else {
+                  this.errorInsert(_context2.t2.response);
+                }
+
+              case 33:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[0, 30]]);
+      }));
+
+      function sendAPIs(_x) {
+        return _sendAPIs.apply(this, arguments);
+      }
+
+      return sendAPIs;
+    }(),
+    errorInsert: function errorInsert(error) {
+      var status = error.status,
+          statusText = error.statusText;
+      this.res.status = status;
+      this.res.message = statusText;
+      console.log(this.res.status, this.res.message);
     }
+  },
+  created: function created() {
+    this.createdAction();
   }
 });
 
@@ -2280,6 +2458,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+//
+//
 //
 //
 //
@@ -2858,39 +3038,6 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: true
     }
-  }
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/term/TermListComponent.vue?vue&type=script&lang=js&":
-/*!*********************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/term/TermListComponent.vue?vue&type=script&lang=js& ***!
-  \*********************************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {
-    console.log('Component mounted.');
   }
 });
 
@@ -7369,7 +7516,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#Modal[data-v-acc72708] {\n    background: rgb(113, 202, 165);\n    color:white;\n    filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));\n}\n#Modal .close_button[data-v-acc72708] {\n    color: rgb(113, 202, 165);\n    background: white;\n}\n#Modal .close_button > span span[data-v-acc72708],\n#Modal .close_button > span[data-v-acc72708]::before,\n#Modal .close_button > span[data-v-acc72708]::after {\n    background: rgb(113, 202, 165);\n}\n#Modal button[data-v-acc72708]{\n    background: white;\n    color: rgb(113, 202, 165);\n}\n#Modal .input_radio[data-v-acc72708]{\n    background: white;\n}\n#Modal label.input_status[data-v-acc72708]{\n    background: white;\n    color: rgb(113, 202, 165);\n}\n#Modal input#status_private:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(202, 113, 113) !important;\n}\n#Modal input#status_member:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(202, 193, 113) !important;\n}\n#Modal input#status_public:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(113, 202, 165) !important;\n}\n#Modal[data-v-acc72708] {\n    z-index:10;\n    overflow-y: auto;\n\n    position:fixed;\n    top:0;\n    bottom:0;\n    left: 105%;\n\n    width: 70vw;\n    height: 100%;\n\n    padding: 7rem 2rem 0;\n    transition:all 0.3s;\n}\n#Modal.visible[data-v-acc72708] {\n    transform: translateX(-105%)\n}\n#Modal.invisible[data-v-acc72708]{\n    opacity: 0 !important;\n}\n#Modal .close_button[data-v-acc72708] {\n    position:sticky;\n    top:2rem;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 5rem;\n    height: 5rem;\n    float:left;\n    border-radius: 2.5rem;\n}\n#Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        content: \"\";\n}\n#Modal .close_button > span[data-v-acc72708]::before {\n        transform: rotate(45deg) translateY(0.7rem);\n}\n#Modal .close_button > span[data-v-acc72708]::after {\n        transform:rotate(-45deg) translateY(-0.7rem);\n}\n#Modal .close_button > span span[data-v-acc72708],\n    #Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        display: block;\n        width: 2rem;\n        height: 0.2rem;\n        transition: all 0.3s;\n}\n#Modal .action[data-v-acc72708]{\n\n    display:flex;\n    justify-content: flex-start;\n    align-items: center;\n\n    height:5rem;\n\n    padding-left: 2rem;\n\n    font-family: 'Nunito';\n    font-size: 4rem;\n    font-weight: 900;\n\n    opacity:0;\n    transition-delay:1s;\n    transition:all 0.3s;\n}\n#Modal.visible .action[data-v-acc72708]{\n    opacity:1 !important;\n}\n#Modal .wrapper[data-v-acc72708]{\n    display:flex;\n    align-items:center;\n    justify-content:flex-start;\n    flex-direction:column;\n\n    width:70%;\n    margin: 0 auto;\n}\n\n/* #Modal label{\n    margin-right: auto;\n} */\n#Modal input#input_title[data-v-acc72708],\n#Modal textarea[data-v-acc72708]{\n    width: 100%;\n\n    margin-bottom:2.5rem;\n    padding: 0.75rem;\n\n    border:none;\n    border-radius: 0.5rem;\n\n    outline: none;\n}\n#Modal textarea[data-v-acc72708]{\n    resize: none;\n\n    height: 15rem;\n}\n#Modal button[data-v-acc72708]{\n    display: flex;\n    align-items: center;\n    justify-content: center;\n\n    width: 9rem;\n    height: 3rem;\n\n    margin: 0 auto;\n    margin-bottom: 5rem;\n\n    border: none;\n    border-radius: 1.5rem;\n}\n#Modal input[id^='status_'][data-v-acc72708]{\n    display: none;\n}\n#Modal .input_radio[data-v-acc72708],\n#Modal .input_status[data-v-acc72708] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n#Modal .input_radio[data-v-acc72708]{\n    padding: 0.25rem;\n    border-radius: 0.5rem;\n    margin-bottom: 2.5rem;\n}\n#Modal label.input_status[data-v-acc72708]{\n    -webkit-user-select: none;\n       -moz-user-select: none;\n        -ms-user-select: none;\n            user-select: none;\n    cursor: pointer;\n\n    width: 5rem;\n    height: 2rem;\n    margin: 0;\n    border-radius: 0.5rem;\n\n    transition:all 0.3s;\n}\n\n\n", ""]);
+exports.push([module.i, "\n#Modal[data-v-acc72708] {\n    background: rgb(113, 202, 165);\n    color:white;\n    filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));\n}\n#Modal .close_button[data-v-acc72708] {\n    color: rgb(113, 202, 165);\n    background: white;\n}\n#Modal .close_button > span span[data-v-acc72708],\n#Modal .close_button > span[data-v-acc72708]::before,\n#Modal .close_button > span[data-v-acc72708]::after {\n    background: rgb(113, 202, 165);\n}\n#Modal button[data-v-acc72708]{\n    background: white;\n    color: rgb(113, 202, 165);\n}\n#Modal .input_radio[data-v-acc72708]{\n    background: white;\n}\n#Modal label.input_status[data-v-acc72708]{\n    background: white;\n    color: rgb(113, 202, 165);\n}\n#Modal input#status_private:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(202, 113, 113) !important;\n}\n#Modal input#status_member:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(202, 193, 113) !important;\n}\n#Modal input#status_public:checked +\nlabel[data-v-acc72708]{\n    color: white !important;\n    background: rgb(113, 202, 165) !important;\n}\n#Modal[data-v-acc72708] {\n    z-index:10;\n    overflow-y: auto;\n\n    position:fixed;\n    top:0;\n    bottom:0;\n    left: 105%;\n\n    width: 70vw;\n    height: 100%;\n\n    padding: 7rem 2rem 0;\n    transition:all 0.3s;\n}\n#Modal.visible[data-v-acc72708] {\n    transform: translateX(-105%)\n}\n#Modal.invisible[data-v-acc72708]{\n    opacity: 0 !important;\n}\n#Modal .close_button[data-v-acc72708] {\n    position:sticky;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 5rem;\n    height: 5rem;\n    float:left;\n    border-radius: 2.5rem;\n}\n#Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        content: \"\";\n}\n#Modal .close_button > span[data-v-acc72708]::before {\n        transform: rotate(45deg) translateY(0.7rem);\n}\n#Modal .close_button > span[data-v-acc72708]::after {\n        transform:rotate(-45deg) translateY(-0.7rem);\n}\n#Modal .close_button > span span[data-v-acc72708],\n    #Modal .close_button > span[data-v-acc72708]::before,\n    #Modal .close_button > span[data-v-acc72708]::after {\n        display: block;\n        width: 2rem;\n        height: 0.2rem;\n        transition: all 0.3s;\n}\n#Modal .action[data-v-acc72708]{\n\n    display:flex;\n    justify-content: flex-start;\n    align-items: center;\n\n    height:5rem;\n\n    padding-left: 2rem;\n\n    font-family: 'Nunito';\n    font-size: 4rem;\n    font-weight: 900;\n\n    opacity:0;\n    transition-delay:1s;\n    transition:all 0.3s;\n}\n#Modal.visible .action[data-v-acc72708]{\n    opacity:1 !important;\n}\n#Modal .wrapper[data-v-acc72708]{\n    display:flex;\n    align-items:center;\n    justify-content:flex-start;\n    flex-direction:column;\n\n    width:65%;\n    margin: 0 auto;\n}\n#Modal .wrapper .container[data-v-acc72708]{\n    width: 100%;\n}\n\n/* #Modal label{\n    margin-right: auto;\n} */\n#Modal input#input_title[data-v-acc72708],\n#Modal textarea[data-v-acc72708]{\n    width: 100%;\n\n    margin-bottom:2.5rem;\n    padding: 0.75rem;\n\n    border:none;\n    border-radius: 0.5rem;\n\n    outline: none;\n}\n#Modal textarea[data-v-acc72708]{\n    resize: none;\n\n    height: 15rem;\n}\n#Modal button[data-v-acc72708]{\n    display: flex;\n    align-items: center;\n    justify-content: center;\n\n    width: 9rem;\n    height: 3rem;\n\n    margin: 0 auto;\n    margin-bottom: 5rem;\n\n    border: none;\n    border-radius: 1.5rem;\n}\n#Modal input[id^='status_'][data-v-acc72708]{\n    display: none;\n}\n#Modal .input_radio[data-v-acc72708],\n#Modal .input_status[data-v-acc72708] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n#Modal .input_radio[data-v-acc72708]{\n    padding: 0.25rem;\n    border-radius: 0.5rem;\n    margin-bottom: 2.5rem;\n}\n#Modal label.input_status[data-v-acc72708]{\n    -webkit-user-select: none;\n       -moz-user-select: none;\n        -ms-user-select: none;\n            user-select: none;\n    cursor: pointer;\n\n    width: 5rem;\n    height: 2rem;\n    margin: 0;\n    border-radius: 0.5rem;\n\n    transition:all 0.3s;\n}\n\n\n", ""]);
 
 // exports
 
@@ -40352,175 +40499,190 @@ var render = function() {
         _vm._v("\n        " + _vm._s(_vm.action.toUpperCase()) + "\n    ")
       ]),
       _vm._v(" "),
-      this.action != "create"
+      _vm.action !== "create"
         ? _c("div", { staticClass: "wrapper" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.items.post_title))]),
-            _vm._v(" "),
-            _c("div")
+            _c("h3", [_vm._v(_vm._s(_vm.old_title))])
           ])
         : _vm._e(),
       _vm._v(" "),
-      this.action == "create" || this.action == "edit"
+      _vm.action == "create" || _vm.action == "edit"
         ? _c(
             "div",
-            { class: ["wrapper", this.action == "create" ? "create" : "edit"] },
+            { class: ["wrapper", _vm.action == "create" ? "create" : "edit"] },
             [
-              _c("label", { attrs: { for: "input_title" } }, [_vm._v("TITLE")]),
+              _vm.new_title !== null
+                ? _c("div", { staticClass: "container" }, [
+                    _c("label", { attrs: { for: "input_title" } }, [
+                      _vm._v("TITLE")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.new_title,
+                          expression: "new_title"
+                        }
+                      ],
+                      attrs: { id: "input_title", required: "" },
+                      domProps: { value: _vm.new_title },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.new_title = $event.target.value
+                        }
+                      }
+                    })
+                  ])
+                : _vm._e(),
               _vm._v(" "),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.new_title,
-                    expression: "new_title"
-                  }
-                ],
-                attrs: { id: "input_title", required: "" },
-                domProps: { value: _vm.new_title },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.new_title = $event.target.value
-                  }
-                }
-              }),
+              _vm.getContent !== null
+                ? _c("div", { staticClass: "container" }, [
+                    _c("label", { attrs: { for: "input_content" } }, [
+                      _vm._v("CONTENT")
+                    ]),
+                    _vm._v(" "),
+                    _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.new_content,
+                          expression: "new_content"
+                        }
+                      ],
+                      attrs: { id: "input_content", required: "" },
+                      domProps: { value: _vm.new_content },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.new_content = $event.target.value
+                        }
+                      }
+                    })
+                  ])
+                : _vm._e(),
               _vm._v(" "),
-              _c("label", { attrs: { for: "input_content" } }, [
-                _vm._v("CONTENT")
-              ]),
-              _vm._v(" "),
-              _c("textarea", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.new_content,
-                    expression: "new_content"
-                  }
-                ],
-                attrs: { id: "input_content", required: "" },
-                domProps: { value: _vm.new_content },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.new_content = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _c("label", [_vm._v("STATUS")]),
-              _vm._v(" "),
-              _c("div", { staticClass: "input_radio" }, [
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.new_status,
-                      expression: "new_status"
-                    }
-                  ],
-                  attrs: {
-                    type: "radio",
-                    id: "status_private",
-                    value: "private"
-                  },
-                  domProps: { checked: _vm._q(_vm.new_status, "private") },
-                  on: {
-                    change: function($event) {
-                      _vm.new_status = "private"
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c(
-                  "label",
-                  {
-                    staticClass: "input_status",
-                    attrs: { for: "status_private" }
-                  },
-                  [_vm._v("Private")]
-                ),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.new_status,
-                      expression: "new_status"
-                    }
-                  ],
-                  attrs: {
-                    type: "radio",
-                    id: "status_member",
-                    value: "member"
-                  },
-                  domProps: { checked: _vm._q(_vm.new_status, "member") },
-                  on: {
-                    change: function($event) {
-                      _vm.new_status = "member"
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c(
-                  "label",
-                  {
-                    staticClass: "input_status",
-                    attrs: { for: "status_member" }
-                  },
-                  [_vm._v("Member")]
-                ),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.new_status,
-                      expression: "new_status"
-                    }
-                  ],
-                  attrs: {
-                    type: "radio",
-                    id: "status_public",
-                    value: "public"
-                  },
-                  domProps: { checked: _vm._q(_vm.new_status, "public") },
-                  on: {
-                    change: function($event) {
-                      _vm.new_status = "public"
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c(
-                  "label",
-                  {
-                    staticClass: "input_status",
-                    attrs: { for: "status_public" }
-                  },
-                  [_vm._v("Public")]
-                )
-              ])
+              _vm.new_status !== null
+                ? _c("div", [
+                    _c("label", [_vm._v("STATUS")]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "input_radio" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.new_status,
+                            expression: "new_status"
+                          }
+                        ],
+                        attrs: {
+                          type: "radio",
+                          id: "status_private",
+                          value: "private",
+                          required: ""
+                        },
+                        domProps: {
+                          checked: _vm._q(_vm.new_status, "private")
+                        },
+                        on: {
+                          change: function($event) {
+                            _vm.new_status = "private"
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "label",
+                        {
+                          staticClass: "input_status",
+                          attrs: { for: "status_private" }
+                        },
+                        [_vm._v("Private")]
+                      ),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.new_status,
+                            expression: "new_status"
+                          }
+                        ],
+                        attrs: {
+                          type: "radio",
+                          id: "status_member",
+                          value: "member"
+                        },
+                        domProps: { checked: _vm._q(_vm.new_status, "member") },
+                        on: {
+                          change: function($event) {
+                            _vm.new_status = "member"
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "label",
+                        {
+                          staticClass: "input_status",
+                          attrs: { for: "status_member" }
+                        },
+                        [_vm._v("Member")]
+                      ),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.new_status,
+                            expression: "new_status"
+                          }
+                        ],
+                        attrs: {
+                          type: "radio",
+                          id: "status_public",
+                          value: "public"
+                        },
+                        domProps: { checked: _vm._q(_vm.new_status, "public") },
+                        on: {
+                          change: function($event) {
+                            _vm.new_status = "public"
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "label",
+                        {
+                          staticClass: "input_status",
+                          attrs: { for: "status_public" }
+                        },
+                        [_vm._v("Public")]
+                      )
+                    ])
+                  ])
+                : _vm._e()
             ]
           )
         : _vm._e(),
       _vm._v(" "),
-      this.action == "preview"
+      _vm.action == "preview"
         ? _c("div", {
             staticClass: "wrapper preview",
             domProps: { innerHTML: _vm._s(_vm.new_content) }
           })
         : _vm._e(),
       _vm._v(" "),
-      this.action == "delete"
+      _vm.action == "delete"
         ? _c("div", { staticClass: "wrapper delete" }, [
             _c("p", [
               _vm._v(
@@ -40530,7 +40692,7 @@ var render = function() {
           ])
         : _vm._e(),
       _vm._v(" "),
-      this.action != "preview"
+      _vm.action != "preview"
         ? _c(
             "button",
             {
@@ -40690,6 +40852,7 @@ var render = function() {
                     attrs: {
                       created_at: item.created_at,
                       updated_at: item.updated_at,
+                      status: "public",
                       name: item.term_name,
                       id: item.term_id
                     },
@@ -40716,7 +40879,8 @@ var render = function() {
           event_on: _vm.modal,
           token: _vm.token,
           action: _vm.modal_action,
-          post_id: _vm.modal_post_id
+          data_id: _vm.modal_post_id,
+          data_name: _vm.data_name
         },
         on: { element_modal_action: _vm.elementModalAction }
       })
@@ -41106,51 +41270,6 @@ var render = function() {
   })
 }
 var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/term/TermListComponent.vue?vue&type=template&id=f91b9c0a&":
-/*!*************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/term/TermListComponent.vue?vue&type=template&id=f91b9c0a& ***!
-  \*************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row justify-content-center" }, [
-        _c("div", { staticClass: "col-md-8" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _vm._v("Example Component")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _vm._v("\n                    test Term List\n                ")
-            ])
-          ])
-        ])
-      ])
-    ])
-  }
-]
 render._withStripped = true
 
 
@@ -56481,8 +56600,6 @@ module.exports = function(module) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
 /* harmony import */ var _components_Main_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/Main.vue */ "./resources/js/components/Main.vue");
-/* harmony import */ var _components_term_TermListComponent_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/term/TermListComponent.vue */ "./resources/js/components/term/TermListComponent.vue");
-
 
 
 /**
@@ -56541,7 +56658,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
   }, {
     path: vue_route_path + '/term',
     name: 'term.list',
-    component: _components_term_TermListComponent_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    component: _components_Main_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   }]
 });
 var app = new Vue({
@@ -57356,75 +57473,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_VueCSRF_vue_vue_type_template_id_f8085ce2___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_VueCSRF_vue_vue_type_template_id_f8085ce2___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
-
-
-
-/***/ }),
-
-/***/ "./resources/js/components/term/TermListComponent.vue":
-/*!************************************************************!*\
-  !*** ./resources/js/components/term/TermListComponent.vue ***!
-  \************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _TermListComponent_vue_vue_type_template_id_f91b9c0a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TermListComponent.vue?vue&type=template&id=f91b9c0a& */ "./resources/js/components/term/TermListComponent.vue?vue&type=template&id=f91b9c0a&");
-/* harmony import */ var _TermListComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TermListComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/term/TermListComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
-
-
-
-
-/* normalize component */
-
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _TermListComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _TermListComponent_vue_vue_type_template_id_f91b9c0a___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _TermListComponent_vue_vue_type_template_id_f91b9c0a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* hot reload */
-if (false) { var api; }
-component.options.__file = "resources/js/components/term/TermListComponent.vue"
-/* harmony default export */ __webpack_exports__["default"] = (component.exports);
-
-/***/ }),
-
-/***/ "./resources/js/components/term/TermListComponent.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************!*\
-  !*** ./resources/js/components/term/TermListComponent.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TermListComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./TermListComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/term/TermListComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TermListComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
-
-/***/ }),
-
-/***/ "./resources/js/components/term/TermListComponent.vue?vue&type=template&id=f91b9c0a&":
-/*!*******************************************************************************************!*\
-  !*** ./resources/js/components/term/TermListComponent.vue?vue&type=template&id=f91b9c0a& ***!
-  \*******************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TermListComponent_vue_vue_type_template_id_f91b9c0a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./TermListComponent.vue?vue&type=template&id=f91b9c0a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/term/TermListComponent.vue?vue&type=template&id=f91b9c0a&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TermListComponent_vue_vue_type_template_id_f91b9c0a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TermListComponent_vue_vue_type_template_id_f91b9c0a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

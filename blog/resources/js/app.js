@@ -1,6 +1,5 @@
 import VueRouter from 'vue-router';
-import PostListComponent from "./components/Main.vue";
-import TermListComponent from "./components/term/TermListComponent.vue";
+import MainComponent from "./components/Main.vue";
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -64,12 +63,12 @@ const router = new VueRouter({
         {
             path: vue_route_path + '/post',
             name: 'post.list',
-            component: PostListComponent ,
+            component: MainComponent ,
         },
         {
             path: vue_route_path + '/term',
             name: 'term.list',
-            component: TermListComponent ,
+            component: MainComponent ,
         }
     ]
 });

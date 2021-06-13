@@ -33,6 +33,7 @@
             v-if="action == 'create' || action =='edit'"
         >
             <div
+                class="container"
                 v-if="new_title !== null"
             >
                 <label for="input_title">TITLE</label>
@@ -40,7 +41,8 @@
             </div>
 
             <div
-                v-if="new_content !== null"
+                class="container"
+                v-if="getContent !== null"
             >
             <label for="input_content">CONTENT</label>
             <textarea id="input_content" v-model="new_content" required></textarea>
@@ -90,7 +92,7 @@
 </template>
 
 <script>
-    module.exports = {
+    export default {
         props: {
             event_on: Boolean,
             token:String,
@@ -102,43 +104,52 @@
             return {
                 items:null,
                 old_title:null,
-                new_title:null,
-                new_content:null,
-                new_status:null,
+                new_title:'',
+                new_content:'',
+                new_status:'private',
                 res:{
                     status:null,
                     message:null,
                 },
             }
         },
+        computed:{
+            getTitle:function(){
+                return this.new_title
+            },
+            getContent:function(){
+                return this.new_content
+            },
+            getStatus:function(){
+                return this.new_status
+            }
+        },
         watch:{
             data_id:async function(){
                 // data_idを監視し正常に値が代入されたタイミングで起動
                 // Param初期値を代入
+                // Modalのインスタンスを使いまわす関係上一度しか実行されないcreatedやmountedにはかかずに
+                // idの変更のみを監視とし同一idの別の処理（特にpreview）を高速起動させたい
+                this.old_title = 'Now loading...'
+                this.new_title = null
+                this.new_content = null
+                this.new_status = this.data_name === 'post' ? 'private' : null
 
                 if(this.action !== 'create' || this.data_id !== null){
                     // create以外の時のaxios通信
-                    let data_slug = '/' + this.data_id
-                    let routePath = this.$route.path
-                    let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_slug
+                    const path = this.getAPIsPath()
                     try{
                         const response = await axios.get(path ,{params:{api_token:this.token}})
                         this.items = response.data
 
-                        switch(this.data_name){
-                            case 'post':
-                                this.new_title = this.old_title = this.items.post_title
-                                this.new_content = this.items.post_content
-                                this.new_status = this.items.post_status
-                                break;
-                            case 'term':
-                                this.new_title = this.old_title = this.term_name
-                        } 
+                        this.notCreatedAction()
                     }
                     catch(error){
                         this.errorInsert(error.response)
                     }
 
+                }else{
+                    this.createdAction()
                 }
 
                 // statusがnullではないなら初期値を:checkedする
@@ -177,33 +188,67 @@
             emitAction: function () {
                 this.$emit('element_modal_action', false )
             },
-            sendAPIs:async function( state ){
-                // actionにより異なったリクエストを送信する
-                let data_id = this.action !== 'create' && this.data_id !== null && this.data_id !=='undefind' ? '/' + this.data_id : '';
+            getAPIsPath:function(){
+                let data_id = this.action !== 'create' && this.$isSetable(this.data_id) ? '/' + this.data_id : '';
                 let routePath = this.$route.path
                 let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_id
-
-                let params 
+                return path
+            },
+            createdAction:function(){
+                if(this.action === 'create'){
+                    switch(this.data_name){
+                        case 'post':
+                            this.new_title = ''
+                            this.new_content = ''
+                            this.new_status = 'private'
+                            break;
+                        case 'term':
+                            this.new_title = ''
+                            break;
+                        default :
+                            break;
+                    }
+                }
+            },
+            notCreatedAction:function(){
                 switch(this.data_name){
                     case 'post':
-                        // laravelでもvalidateしているがここでも想定外のstatusをprivate
-                        this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private'
-                        params = {
-                            post_title:this.new_title,
-                            post_content:this.new_content,
-                            post_status:this.new_status,
-                        }
+                        this.new_title = this.old_title = this.items.post_title
+                        this.new_content = this.items.post_content
+                        this.new_status = this.items.post_status
                         break;
-
                     case 'term':
-                        params = {
-                            post_title:this.new_title,
-                        }
-                        break;
+                        this.new_title = this.old_title = this.term_name
                 }
-
-                let res 
+            },
+            sendAPIs:async function( state ){
+                // actionにより異なったリクエストを送信する
+                // Throw the ContentEmptyError if the form parameter is empty
                 try{
+                    const path = this.getAPIsPath()
+                    let params
+                    switch(this.data_name){
+                        case 'post':
+                            if(this.new_title === "" || this.new_title === ""){
+                                throw new ContentEmpty()
+                            }
+                            // laravelでもvalidateしているがここでも想定外のstatusをデフォルトの値に修正する
+                            this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private'
+                            params = {
+                                post_title:this.new_title,
+                                post_content:this.new_content,
+                                post_status:this.new_status,
+                            }
+                            break;
+
+                        case 'term':
+                            params = {
+                                post_title:this.new_title,
+                            }
+                            break;
+                    }
+
+                    let res
                     switch(state){
                         case 'edit':
                             res = await axios.put(path+'?api_token='+this.token,params)
@@ -219,9 +264,13 @@
                     }
                 }
                 catch(error){
-                    this.errorInsert(error.response)
+                    if(error instanceof ContentEmpty ){
+                        this.errorInsert([700,'空の項目があります。'])
+                    }else{
+                        this.errorInsert(error.response)
+                    }
                 }
-                
+
             },
             errorInsert:function(error){
                 const {
@@ -235,21 +284,8 @@
             }
         },
         created:function(){
-            this.new_status = 'private'
-            if(this.action === 'create'){
-                switch(this.data_name){
-                    case 'post':
-                        this.new_title = ""
-                        this.new_content = ""
-                        this.new_status = 'private'
-                        break;
-                    case 'term':
-                        this.new_title = ""
-                        this.new_status = null
-                        break;
-                }
-            }
-                
+            this.createdAction()
+
         }
     }
 </script>
@@ -322,7 +358,6 @@
     }
     #Modal .close_button {
         position:sticky;
-        top:2rem;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -376,8 +411,11 @@
         justify-content:flex-start;
         flex-direction:column;
 
-        width:70%;
+        width:65%;
         margin: 0 auto;
+    }
+    #Modal .wrapper .container{
+        width: 100%;
     }
 
     /* #Modal label{

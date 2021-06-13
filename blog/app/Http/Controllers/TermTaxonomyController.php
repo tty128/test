@@ -2,30 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Term;
+use App\TermTaxonomy;
 use Illuminate\Http\Request;
 
-class TermController extends Controller
+class TermTaxonomyController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Term $term)
+    public function index()
     {
-        $term = $term->from('term as t')
-            ->join('term_taxonomy as ttx','t.term_id','=','ttx.term_id')
-            ->get([
-                'term_taxonomy_id',
-                'taxonomy as taxonomy_name',
-                't.term_name as term_name',
-                'desc',
-                'ttx.created_at',
-                'ttx.updated_at',
-            ]);
-        return $term;
+        //
     }
 
     /**
@@ -46,27 +35,27 @@ class TermController extends Controller
      */
     public function store(Request $request)
     {
-        Term::create($request->all());
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\TermTaxonomy  $termTaxonomy
      * @return \Illuminate\Http\Response
      */
-    public function show(Term $term)
+    public function show(TermTaxonomy $termTaxonomy)
     {
-        return $term;
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\TermTaxonomy  $termTaxonomy
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(TermTaxonomy $termTaxonomy)
     {
         //
     }
@@ -75,22 +64,22 @@ class TermController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\TermTaxonomy  $termTaxonomy
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Term $term)
+    public function update(Request $request, TermTaxonomy $termTaxonomy)
     {
-        $term->update($request->all());
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\TermTaxonomy  $termTaxonomy
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Term $term)
+    public function destroy(TermTaxonomy $termTaxonomy)
     {
-        $term->delete();
+        //
     }
 }

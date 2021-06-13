@@ -52,6 +52,7 @@
                     @element_card_action="elementCardAction"
                     :created_at = "item.created_at"
                     :updated_at = "item.updated_at"
+                    status = "public"
                     :name = "item.term_name"
                     :id = "item.term_id"
                 ></laravel-element-card>
@@ -73,7 +74,8 @@
             :event_on="modal"
             :token="token"
             :action="modal_action"
-            :post_id="modal_post_id"
+            :data_id="modal_post_id"
+            :data_name="data_name"
         ></laravel-modal>
         <!-- Fixed Element End -->
     </section>
