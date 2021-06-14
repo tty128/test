@@ -12,7 +12,7 @@ class Term extends Model
 
     protected $fillable = [
         'term_name',
-        'term_taxonomy',
+        'term_group',
     ];
 
     public function termTaxonomy()
