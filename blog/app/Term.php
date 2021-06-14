@@ -18,6 +18,6 @@ class Term extends Model
 
     public function termTaxonomy()
     {
-        return $this->hasMany('App\TermTaxonomy', 'term_id');
+        return $this->belongsTo('App\TermTaxonomy');
     }
 }
