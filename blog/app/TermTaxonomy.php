@@ -11,7 +11,6 @@ class TermTaxonomy extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'term_id',
         'taxonomy',
         'desc',
         'parent',
