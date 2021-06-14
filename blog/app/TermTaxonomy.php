@@ -19,7 +19,7 @@ class TermTaxonomy extends Model
 
     public function term()
     {
-        return $this->belongsTo('App\Term');
+        return $this->hasMany('App\Term');
     }
 
     public function termRelationship()
