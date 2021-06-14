@@ -13,19 +13,25 @@ class TermController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Term $term)
+    public function index(Term $term,TermTaxonomy $term_taxonomy)
     {
         $term = $term->from('term as t')
-            ->join('term_taxonomy as ttx','t.term_id','=','ttx.term_id')
+            ->join('term_taxonomy as ttx','t.term_taxonomy_id','=','ttx.term_taxonomy_id')
+            ->orderby('term_id','desc')
             ->get([
-                'term_taxonomy_id',
-                'taxonomy as taxonomy_name',
-                't.term_name as term_name',
-                'desc',
-                'ttx.created_at',
-                'ttx.updated_at',
+                'term_id',
+                'ttx.taxonomy as taxonomy',
+                'term_name',
             ]);
-        return $term;
+        
+        $term_taxonomy = $term_taxonomy->get();
+        
+        $collection = collect([
+            'taxonomy' => $tarm_taxonomy,
+            'term' => $term,
+        ]);
+        
+        return $collection;
     }
 
     /**
@@ -44,7 +50,7 @@ class TermController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request,Term $term,TermTaxonomy $term_taxonomy)
     {
         Term::create($request->all());
     }
