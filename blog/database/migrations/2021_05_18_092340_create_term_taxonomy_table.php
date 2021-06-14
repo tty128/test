@@ -15,7 +15,6 @@ class CreateTermTaxonomyTable extends Migration
     {
         Schema::create('term_taxonomy', function (Blueprint $table) {
             $table->bigIncrements('term_taxonomy_id');
-            $table->bigInteger('term_id');
             $table->string('taxonomy',64);
             $table->longText('desc');
             $table->bigInteger('parent')->nullable();
