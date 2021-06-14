@@ -12,6 +12,7 @@ class Term extends Model
 
     protected $fillable = [
         'term_name',
+        'term_taxonomy_id',
         'term_group',
     ];
 
