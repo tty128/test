@@ -1,7 +1,30 @@
 @extends('layouts.manage_app')
 
-@section('content')
+@section('header')
+    <laravel-manage-header
+        app_name="{{ config('app.name', 'Laravel') }}"
+        user_name="{{ Auth::user()->name }}"
+        route_logout="/logout"
+        :csrf="{{ json_encode( csrf_token() ) }}"
+    />
+@endsection
 
-    <laravel-main-handle token="{{Auth::user()->api_token}}"></laravel-main-handle>
+@section('sidebar')
+    <laravel-sidebar />
+@endsection
+
+@section('main')
+    <laravel-main-handle
+        token="{{Auth::user()->api_token}}"
+        :obj="{{ json_encode([
+                'post' => $post,
+                'term' => $term
+            ]) }}"
+    />
+@endsection
+
+@section('footer')
 
 @endsection
+
+

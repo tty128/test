@@ -13,12 +13,14 @@ class TermTableSeeder extends Seeder
     {
         App\Term::create(
             [
+                'term_taxonomy_id'=>1,
                 'term_name' => 'tag',
                 'term_group' => 0,
             ]
         );
         App\Term::create(
             [
+                'term_taxonomy_id' => 1,
                 'term_name' => 'category',
                 'term_group' => 1,
             ]

@@ -22,6 +22,3 @@ Route::group(['middleware' => 'auth:api'],function () {
     Route::apiResource('post', 'PostController');
     Route::apiResource('term', 'TermController');
 });
-
-// 今回は外部APIでPOSTたたかないため関係ないが、一応apiでPOSTした場合のチェックしてみたい。
-//Route::middleware('auth:api')->post('/post/create', 'PostController@store')->name('api_postcreate'); //未チェック

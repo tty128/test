@@ -22,16 +22,13 @@
 </head>
 <body>
     <div id="app">
-        <laravel-manage-header
-            app_name="{{ config('app.name', 'Laravel') }}"
-            user_name="{{ Auth::user()->name }}"
-            route_logout="/logout"
-            :csrf="{{ json_encode( csrf_token() ) }}"
-        ></laravel-manage-header>
+        <header>@yield('header')</header>
 
-        <main>
-            @yield('content')
-        </main>
+        <aside>@yield('sidebar')</aside>
+
+        <main>@yield('main')</main>
+
+        <footer>@yield('footer')</footer>
     </div>
     <script src="{{ mix('/js/app.js') }}" defer></script>
 </body>

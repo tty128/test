@@ -16,8 +16,9 @@ class PostController extends Controller
      */
     public function index(Request $request,Post $post)
     {
+        $auth_id = isset($request->user()->id) ? $request->user()->id : Auth::id();
         $post = $post
-            ->where('post_author', '=', $request->user()->id)
+            ->where('post_author', '=', $auth_id)
             ->orWhere('post_status', '<>', 'private')
             ->orderBy('post.created_at', 'desc')
             ->join('users as pca', 'post_author', '=', 'pca.id')
@@ -32,7 +33,7 @@ class PostController extends Controller
                 'pua.name as post_update_author_name',
             ]);
 
-        return $post;
+        return ['post' => $post];
 
     }
 

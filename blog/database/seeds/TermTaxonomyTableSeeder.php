@@ -13,21 +13,17 @@ class TermTaxonomyTableSeeder extends Seeder
     {
         App\TermTaxonomy::create(
             [
-                'term_id' => 0,
-                'taxonomy' => 'tag1',
-                'desc' => 'taggable1',
+                'taxonomy' => 'TAG',
+                'desc' => 'taggable',
                 'parent' => 0,
-                'count' => 1,
             ]
         );
 
         App\TermTaxonomy::create(
             [
-                'term_id' => 1,
-                'taxonomy' => 'cate1',
-                'desc' => 'category1',
+                'taxonomy' => 'CATEGORY',
+                'desc' => 'category',
                 'parent' => 0,
-                'count' => 1,
             ]
         );
     }

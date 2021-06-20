@@ -10,26 +10,26 @@
             Prev
         </li>
         <li
-            :class="['page-1' , startViewPages <= 0 ? 'invisible' : '']"
+            :class="['page-prev' , startPage <= 0 ? 'invisible' : '']"
             @click="pageRoute(1)"
         >
-            1
+            First
         </li>
         <li>
             <div
                 v-for="n in  maxViewPages"
                 :key="n"
-                :class="['page-' + ( n + startViewPages ) , isCurrent( n + startViewPages ) ? 'paginate-current':'']"
-                @click = "[isCurrent( n ) ? '':pageRoute( n )]"
+                :class="['page-' + ( n + startPage ) , isCurrent( n + startPage ) ? 'paginate-current':'']"
+                @click = "[isCurrent( n + startPage) ? '':pageRoute( n + startPage )]"
             >
-                {{ n + startViewPages }}
+                {{ n + startPage }}
             </div>
         </li>
         <li
-            :class="['page-' + lastPage , !(startViewPages >= maxViewPages) ? 'invisible' : '']"
+            :class="['page-next' , startPage + maxViewPages >= lastPage  ? 'invisible' : '']"
             @click="pageRoute(lastPage)"
         >
-            {{ lastPage }}
+            Last
         </li>
         <li
             :class="['page-next' , !isLastPage() ? 'invisible' : '']"
@@ -44,7 +44,6 @@
     export default {
         props: {
             last_page: Number,
-            current_page: Number,
             max_view_pages:Number,
         },
         computed:{
@@ -52,53 +51,55 @@
                 return this.$isSetable(this.last_page) ? this.last_page : 1
             },
             maxViewPages:function(){
-                let mvp = this.max_view_pages > this.last_page ? this.last_page : this.max_view_pages
-                return mvp
+                return this.max_view_pages > this.last_page ? this.last_page : this.max_view_pages
             },
-            startViewPages:function(){
-                let n = 0
-                let mvp = this.max_view_pages > this.lastPage ? this.lastPage : this.max_view_pages
-                let mvp_r = Math.floor(mvp/2)
+            startPage:function(){
+                const mvp = this.max_view_pages
+                const half_view_pages = Math.ceil(mvp/2)
+                const last_page = this.last_page
 
-                let lp = this.$isSetable(this.last_page) ? this.last_page : 1
-                let cp = this.$isSetable(this.crrent_page) ? this.crrent_page : 1
+                const num = (typeof(this.$route.query.page) == 'object' || typeof(this.$route.query.page) === "undefined") ? 1 : Number(this.$route.query.page)
 
-                if(cp - mvp_r <= 0 ){
-                    n = 0
-                }
-                else if(cp + mvp_r >= lp){
-                    n = lp - mvp
-                }
-                else{
-                    n = cp - mvp_r
-                }
-                return n
-            }
+                let start = 0
+                if( num <= half_view_pages || mvp >= last_page){ start = 0 }
+                else if( num + half_view_pages > last_page ){ start = last_page - mvp}
+                else{ start = num - half_view_pages}
+
+                return start
+            },
         },
         methods: {
+            currentPage:function(){
+                // query params['page']が Number ならそのまま取得し、それ以外なら1を返す
+                return (typeof(this.$route.query.page) == 'object' || typeof(this.$route.query.page) === "undefined") ? 1 : Number(this.$route.query.page)
+            },
             isCurrent: function (n) {
-                this.current_page = typeof(this.current_page) == 'number' ? this.current_page : 1
-                return n == this.current_page
+                let current_page = this.currentPage()
+                return n == (typeof(current_page) == 'number' ? current_page : 1)
             },
             isFirstPage: function () {
-                return (this.last_page != 1 && this.current_page != 1)
+                return (this.last_page != 1 && this.currentPage() != 1)
             },
             isLastPage: function () {
-                return (this.last_page != 1 && this.current_page != this.last_page)
+                const page_num = this.last_page
+                return (page_num != 1 && this.currentPage() != page_num)
             },
             pageRoute: function (n) {
                 this.$router.push({ path: this.$route.path + '?page=' + n })
             },
             pageRouteNext: function () {
-                let query = this.current_page + 1
+                let query = this.currentPage() + 1
                 let pages = query > this.last_page ? this.last_page : query
-                this.$router.push({ path: this.$route.path + '?page=' + pages })
+                this.pageRoute(pages)
             },
             pageRoutePrev: function () {
-                let query = this.current_page - 1
+                let query = this.currentPage() - 1
                 let pages = query < 1 ? 1 : query
-                this.$router.push({ path: this.$route.path + '?page=' + pages })
+                this.pageRoute(pages)
             }
+        },
+        created : function() {
+            this.pageRoute(this.currentPage())
         }
     }
 </script>
@@ -145,6 +146,12 @@
             margin:0 0.2rem;
 
             background: #E6F6D1;
+
+            transition: all 0.3s;
+        }
+
+        .vue_paginate [class^="page-"]:hover{
+            background: red;
         }
 
         .vue_paginate .page-next , .vue_paginate .page-prev {

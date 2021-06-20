@@ -11,9 +11,9 @@ class PostTableSeeder extends Seeder
      */
     public function run()
     {
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             App\Post::create([
-            'post_author' => 0,
+            'post_author' => 1,
             'post_title' => 'title'.$i,
             'post_content' => '
                 sampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletextsampletext

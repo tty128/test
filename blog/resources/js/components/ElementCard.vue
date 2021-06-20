@@ -1,7 +1,7 @@
 <template>
     <div
         :class="['card__wrapper','card__element_status_' + status]"
-        @click = "emitAction( 'edit' )"
+        @click = "emitAction( 'edit' , 'editer')"
     >
         <div class="card__element_at">
             <p>created : {{ created_at }}</p>
@@ -19,13 +19,13 @@
         <ul class="card__element_command">
             <li
                 class="preview"
-                @click.stop="emitAction( 'preview' )"
+                @click.stop="emitAction( 'preview' , 'viewer')"
             >
                 <span>P</span>
             </li>
             <li
                 class="delete"
-                @click.stop="emitAction( 'delete' )"
+                @click.stop="emitAction( 'delete' , 'editer' )"
             >
                 <span>D</span>
             </li>
@@ -43,8 +43,8 @@
             id: Number,
         },
         methods: {
-            emitAction: function (action) {
-                this.$emit('element_card_action', this.id , action )
+            emitAction: function (action,key) {
+                this.$emit('element_card_action', this.id , action ,key )
             }
         }
     }
@@ -72,7 +72,7 @@
 
         margin-bottom: 1.5rem;
 
-        width: 22rem;
+        width: 30rem;
         min-height: 12.5rem;
         height: auto;
 
@@ -93,6 +93,7 @@
 
     .card__wrapper h2{
         margin: 0;
+        word-break: break-all;
     }
 
     .card__container {
@@ -101,6 +102,7 @@
         justify-content: flex-start;
         flex-direction: column;
 
+        margin: auto 0;
         padding:1rem;
     }
 
@@ -112,7 +114,6 @@
         justify-content:flex-end;
         flex-wrap:nowrap;
 
-        margin-top :auto;
         margin-left: auto;
         margin-bottom:0;
         padding:0;
@@ -140,6 +141,7 @@
         margin: 0;
     }
         .card__element_at p {
+            font-size: 1rem;
             margin: 0;
         }
 </style>

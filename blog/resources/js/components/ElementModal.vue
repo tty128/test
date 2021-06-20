@@ -1,12 +1,9 @@
 <template>
-    <div
-        id="Modal"
-        :class="event_on ? 'visible' : ''"
-    >
+    <div class="modal_element">
         <!-- CloseButton -->
         <div
             class="close_button"
-            @click="emitAction"
+            @click="EventOn(false)"
         >
             <span></span>
         </div>
@@ -44,8 +41,8 @@
                 class="container"
                 v-if="getContent !== null"
             >
-            <label for="input_content">CONTENT</label>
-            <textarea id="input_content" v-model="new_content" required></textarea>
+                <label for="input_content">CONTENT</label>
+                <textarea id="input_content" v-model="new_content" required></textarea>
             </div>
 
             <div
@@ -68,8 +65,10 @@
         <div
             class="wrapper preview"
             v-if="action =='preview'"
-            v-html="new_content"
         >
+            <laravel-preview
+                :content_text="new_content"
+            />
         </div>
         <!-- Preview End -->
 
@@ -83,6 +82,13 @@
         <!-- Delete End -->
 
         <button
+            @click="emitActionSimple"
+            v-if="action != 'preview'"
+        >
+            Preview
+        </button>
+
+        <button
             @click="sendAPIs(action)"
             v-if="action != 'preview'"
         >
@@ -92,9 +98,10 @@
 </template>
 
 <script>
+
+
     export default {
         props: {
-            event_on: Boolean,
             token:String,
             action:String,
             data_id:Number,
@@ -124,15 +131,25 @@
                 return this.new_status
             }
         },
-        watch:{
-            data_id:async function(){
+        methods: {
+            emitAction: function () {
+                this.$emit('element_modal_action')
+            },
+            emitActionSimple: function () {
+                this.$emit('element_modal_action_simple',this.new_title,this.new_content)
+            },
+            getAPIsPath:function(){
+                let data_id = this.action !== 'create' && this.$isSetable(this.data_id) ? '/' + this.data_id : '';
+                let routePath = this.$route.path
+                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_id
+                return path
+            },
+            getAPIs:async function(){
                 // data_idを監視し正常に値が代入されたタイミングで起動
                 // Param初期値を代入
                 // Modalのインスタンスを使いまわす関係上一度しか実行されないcreatedやmountedにはかかずに
                 // idの変更のみを監視とし同一idの別の処理（特にpreview）を高速起動させたい
                 this.old_title = 'Now loading...'
-                this.new_title = null
-                this.new_content = null
                 this.new_status = this.data_name === 'post' ? 'private' : null
 
                 if(this.action !== 'create' || this.data_id !== null){
@@ -153,17 +170,15 @@
                 }
 
                 // statusがnullではないなら初期値を:checkedする
-                if(this.new_status !== null){
+                if(this.new_status !== null && (this.action != 'preview' || this.action != 'delete' )){
                     let element = document.getElementById('status_' + this.new_status)
                     element.checked = true
                 }
             },
-            event_on : function(){
-                // Modalの起動を監視し、trueならページの現在値を固定、falseならパラメータを削除する
-                // createdではfalseを拾えないため監視
+            EventOn : function(on){
                 const sbar = window.scrollbars.visible
                 const bs = document.body.style
-                if(this.event_on){
+                if(on){
                     const ws = -1 * window.scrollY
                     bs.position = 'fixed'
                     bs.top = ws +'px'
@@ -181,18 +196,8 @@
                         bs.paddingRight = ''
                     }
                     window.scrollTo(0, parseInt(top , '0') * -1)
+                    this.emitAction()
                 }
-            }
-        },
-        methods: {
-            emitAction: function () {
-                this.$emit('element_modal_action', false )
-            },
-            getAPIsPath:function(){
-                let data_id = this.action !== 'create' && this.$isSetable(this.data_id) ? '/' + this.data_id : '';
-                let routePath = this.$route.path
-                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_id
-                return path
             },
             createdAction:function(){
                 if(this.action === 'create'){
@@ -285,78 +290,73 @@
         },
         created:function(){
             this.createdAction()
-
+            this.EventOn(true)
+            this.getAPIs()
         }
     }
 </script>
 
 <style scoped>
-    #Modal {
+    /*
+        Color
+    */
+    .modal_element {
         background: rgb(113, 202, 165);
         color:white;
         filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
     }
-    #Modal .close_button {
+    .modal_element .close_button {
         color: rgb(113, 202, 165);
         background: white;
     }
-    #Modal .close_button > span span,
-    #Modal .close_button > span::before,
-    #Modal .close_button > span::after {
+    .modal_element .close_button > span span,
+    .modal_element .close_button > span::before,
+    .modal_element .close_button > span::after {
         background: rgb(113, 202, 165);
     }
 
-    #Modal button{
+    .modal_element button{
         background: white;
         color: rgb(113, 202, 165);
     }
 
-    #Modal .input_radio{
+    .modal_element .input_radio{
         background: white;
     }
-    #Modal label.input_status{
+    .modal_element label.input_status{
         background: white;
         color: rgb(113, 202, 165);
     }
-    #Modal input#status_private:checked +
+    .modal_element input#status_private:checked +
     label{
         color: white !important;
         background: rgb(202, 113, 113) !important;
     }
-    #Modal input#status_member:checked +
+    .modal_element input#status_member:checked +
     label{
         color: white !important;
         background: rgb(202, 193, 113) !important;
     }
-    #Modal input#status_public:checked +
+    .modal_element input#status_public:checked +
     label{
         color: white !important;
         background: rgb(113, 202, 165) !important;
     }
 
+    /*
+        Block
+    */
+    .modal_element {
+        width: 750px;
+        height: auto;
+        min-height: 100%;
 
-    #Modal {
-        z-index:10;
-        overflow-y: auto;
-
-        position:fixed;
-        top:0;
-        bottom:0;
-        left: 105%;
-
-        width: 70vw;
-        height: 100%;
-
-        padding: 7rem 2rem 0;
+        margin:0 auto;
+        padding: 7rem 2rem;
         transition:all 0.3s;
     }
-    #Modal.visible {
-        transform: translateX(-105%)
-    }
-    #Modal.invisible{
-        opacity: 0 !important;
-    }
-    #Modal .close_button {
+
+    .modal_element .close_button {
         position:sticky;
         display: flex;
         justify-content: center;
@@ -366,25 +366,26 @@
         float:left;
         border-radius: 2.5rem;
     }
-        #Modal .close_button > span::before,
-        #Modal .close_button > span::after {
+        .modal_element .close_button > span::before,
+        .modal_element .close_button > span::after {
             content: "";
         }
-        #Modal .close_button > span::before {
+        .modal_element .close_button > span::before {
             transform: rotate(45deg) translateY(0.7rem);
         }
-        #Modal .close_button > span::after {
+        .modal_element .close_button > span::after {
             transform:rotate(-45deg) translateY(-0.7rem);
         }
-        #Modal .close_button > span span,
-        #Modal .close_button > span::before,
-        #Modal .close_button > span::after {
+        .modal_element .close_button > span span,
+        .modal_element .close_button > span::before,
+        .modal_element .close_button > span::after {
             display: block;
             width: 2rem;
             height: 0.2rem;
             transition: all 0.3s;
         }
-    #Modal .action{
+
+    .modal_element .action{
 
         display:flex;
         justify-content: flex-start;
@@ -402,10 +403,12 @@
         transition-delay:1s;
         transition:all 0.3s;
     }
-    #Modal.visible .action{
+
+    .modal_element.visible .action{
         opacity:1 !important;
     }
-    #Modal .wrapper{
+
+    .modal_element .wrapper{
         display:flex;
         align-items:center;
         justify-content:flex-start;
@@ -414,16 +417,13 @@
         width:65%;
         margin: 0 auto;
     }
-    #Modal .wrapper .container{
+
+    .modal_element .wrapper .container{
         width: 100%;
     }
 
-    /* #Modal label{
-        margin-right: auto;
-    } */
-
-    #Modal input#input_title,
-    #Modal textarea{
+    .modal_element input#input_title,
+    .modal_element textarea{
         width: 100%;
 
         margin-bottom:2.5rem;
@@ -435,13 +435,13 @@
         outline: none;
     }
 
-    #Modal textarea{
+    .modal_element textarea{
         resize: none;
 
         height: 15rem;
     }
 
-    #Modal button{
+    .modal_element button{
         display: flex;
         align-items: center;
         justify-content: center;
@@ -456,24 +456,24 @@
         border-radius: 1.5rem;
     }
 
-    #Modal input[id^='status_']{
+    .modal_element input[id^='status_']{
         display: none;
     }
 
-    #Modal .input_radio,
-    #Modal .input_status {
+    .modal_element .input_radio,
+    .modal_element .input_status {
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    #Modal .input_radio{
+    .modal_element .input_radio{
         padding: 0.25rem;
         border-radius: 0.5rem;
         margin-bottom: 2.5rem;
     }
 
-    #Modal label.input_status{
+    .modal_element label.input_status{
         user-select: none;
         cursor: pointer;
 

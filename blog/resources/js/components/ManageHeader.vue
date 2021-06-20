@@ -1,45 +1,43 @@
 <template>
-    <header class="manage__header">
-        <div class="wrapper">
-            <router-link
-                    :to="{path:$appPath}"
-                    tag="a"
-                    id="manage__Logo"
-            >
-                {{ appName }}
-            </router-link>
+    <div id="Manage__header">
+        <router-link
+                :to="{path:$appPath}"
+                tag="a"
+                id="Manage__Logo"
+        >
+            {{ appName }}
+        </router-link>
 
-            <div class="manage__container">
-                <ul class="manage__header_ul">
-                    <li>
-                        <input type="checkbox" name="username" id="Button__UserName">
-                        <label for="Button__UserName"
-                            class="label_button"
-                        >
-                            {{ userName }}
-                            <span class="caret"></span>
-                        </label>
+        <div class="manage__container">
+            <ul class="manage__header_ul">
+                <li>
+                    <input type="checkbox" name="username" id="Button__UserName">
+                    <label for="Button__UserName"
+                        class="label_button"
+                    >
+                        {{ userName }}
+                        <span class="caret"></span>
+                    </label>
 
-                        <ul class="manage__dropdown_menu">
-                            <li>
-                                <a
-                                    onclick="event.preventDefault();document.getElementById('logout-form').submit();"
-                                >
-                                    LOGOUT
-                                </a>
+                    <ul class="manage__dropdown_menu">
+                        <li>
+                            <a
+                                onclick="event.preventDefault();document.getElementById('logout-form').submit();"
+                            >
+                                LOGOUT
+                            </a>
 
-                                <form id="logout-form" :action="route_logout" method="POST" style="display: none;">
-                                    <laravel-vue-csrf
-                                        :csrf="CSRFtoken"
-                                    ></laravel-vue-csrf>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+                            <form id="logout-form" :action="route_logout" method="POST" style="display: none;">
+                                <laravel-vue-csrf
+                                    :csrf="CSRFtoken"
+                                ></laravel-vue-csrf>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-    </header>
+    </div>
 </template>
 
 <script>
@@ -48,7 +46,7 @@
             app_name:String,
             user_name:String,
             route_logout:String,
-            csrf:Array,
+            csrf:String,
         },
         data: function() {
             return{
@@ -73,50 +71,39 @@
 
 <style scoped>
 
-header.manage__header{
+#Manage__header{
     color:white;
     background: red;
 }
-header.manage__header >.wrapper >.manage__container{background : green;}
-#manage__Logo{background: blue;}
+#Manage__header >.manage__container{background : green;}
+#Manage__Logo{background: blue;}
 .manage__header_ul .manage__dropdown_menu{background: cornflowerblue;}
 .manage__header_ul .label_button{background: coral;}
 
-header.manage__header{
-    z-index: 100;
-
-    position: fixed;
-    top:0;
-
-    width:100%;
-    height: 5rem;
-}
-
-header.manage__header *{
+#Manage__header *{
     list-style: none;
 
     margin: 0;
     padding:0;
 }
 
-header.manage__header a:link,
-header.manage__header a:visited{
+#Manage__header a:link,
+#Manage__header a:visited{
     color:inherit;
     text-decoration: none;
 }
 
-.manage__header>.wrapper{
+#Manage__header{
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    width: 90%;
     height: 100%;
 
-    margin:0 auto;
+    padding: 0 2rem;
 }
 
-#manage__Logo{
+#Manage__Logo{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,15 +113,12 @@ header.manage__header a:visited{
 
 }
 
-header.manage__header >.wrapper >.manage__container{
+#Manage__header>.manage__container{
     height: 100%;
-
-    float: right;
 }
 
 .manage__header_ul{
     user-select:none;
-
     height: 100%;
 }
 

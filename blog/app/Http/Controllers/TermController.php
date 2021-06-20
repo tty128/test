@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Term;
+use App\TermTaxonomy;
+use Doctrine\DBAL\Schema\Index;
 use Illuminate\Http\Request;
 
 class TermController extends Controller
@@ -23,14 +25,12 @@ class TermController extends Controller
                 'ttx.taxonomy as taxonomy',
                 'term_name',
             ]);
-        
-        $term_taxonomy = $term_taxonomy->get();
-        
+
         $collection = collect([
-            'taxonomy' => $tarm_taxonomy,
+            'taxonomy' => $term_taxonomy,
             'term' => $term,
         ]);
-        
+
         return $collection;
     }
 

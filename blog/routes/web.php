@@ -22,10 +22,17 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['prefix' =>'manage', 'middleware' => ['auth']],function () {
-    Route::get('/', function () {
-        return view('manage');
-    });
-    Route::get('{any}', function() {
-        return view('manage');
+    Route::get('{any?}', function() {
+        $post = app()->make('App\Http\Controllers\PostController')->
+                index(
+                    app()->make('\Illuminate\Http\Request'),
+                    app()->make('App\Post')
+                );
+        $term = app()->make('App\Http\Controllers\TermController')->
+                index(
+                    app()->make('App\Term'),
+                    app()->make('App\TermTaxonomy')
+                );
+        return view('manage', compact('post', 'term'));
     })->where('any', '.*');
 });
