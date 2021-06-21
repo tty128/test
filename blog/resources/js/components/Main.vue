@@ -3,13 +3,13 @@
         <!-- PageTop UI -->
         <div
              class="create"
-             @click ="elementCardAction(null,'create','editer')"
+             @click ="childCardAction(null,'create','editer')"
         >
             Create New {{ this.data_name.toUpperCase() }}
         </div>
 
         <laravel-pagination-limit
-            @element_limit_action="elementLimitAction"
+            @element_limit_action="childLimitAction"
             :limits="limits"
         ></laravel-pagination-limit>
 
@@ -30,7 +30,7 @@
                     class="item_body"
                 >
                     <laravel-element-card
-                        @element_card_action="elementCardAction"
+                        @element_card_action="childCardAction"
                         :created_at = "item.created_at"
                         :updated_at = "item.updated_at"
                         :status = "item.post_status"
@@ -49,7 +49,7 @@
                     class="item_body"
                 >
                     <laravel-element-card
-                        @element_card_action="elementCardAction"
+                        @element_card_action="childCardAction"
                         :created_at = "item.created_at"
                         :updated_at = "item.updated_at"
                         status = "public"
@@ -75,8 +75,9 @@
                 v-if="modal.editer"
             >
                 <laravel-modal
-                    @element_modal_action="elementModalAction('editer')"
-                    @element_modal_action_simple="elementModalActionSimple"
+                    @element_modal_action="childModalAction('editer')"
+                    @element_modal_action_simple="childModalActionSimple"
+                    @items_update="childItemsUpdate"
                     :token="token"
                     :action="modal_action"
                     :data_id="modal_post_id"
@@ -91,7 +92,7 @@
                 v-if="modal.viewer"
             >
                 <laravel-modal
-                    @element_modal_action="elementModalAction('viewer')"
+                    @element_modal_action="childModalAction('viewer')"
                     :token="token"
                     action='preview'
                     :data_id="modal_post_id"
@@ -103,7 +104,7 @@
                 v-if="modal.simple"
             >
                 <simple-modal
-                    @element_modal_action="elementModalAction('simple')"
+                    @element_modal_action="childModalAction('simple')"
                     action="preview"
                     :title="new_title"
                     :content="new_content"
@@ -116,7 +117,6 @@
 
 <script>
     import SimpleModal from './ElementSimpleModal.vue'
-
     export default {
         props: {
             token: String,
@@ -160,11 +160,11 @@
             },
         },
         methods: {
-            elementLimitAction:function(num){
+            childLimitAction:function(num){
                 // Component:PaginateLimitButtonから戻ってきた数値を変数に代入する
                 this.limit = num
             },
-            elementCardAction: function(...arg){
+            childCardAction: function(...arg){
                 // Component:ElementCardから戻ってきたidおよびaction名を各変数に代入（modalで使用）する
                 // その後、modalを起動
                 let [id, action,key] = arg
@@ -172,27 +172,35 @@
                 if(action != 'preview'){
                     this.modal_action=action
                 }
-
                 this.modal[key] = true
             },
-            elementModalAction:function (key){
+            childModalAction:function (key){
                 // Component:ElementModalから戻ってきたBoolean（基本false）
                 // Modalで自身を閉じるための関数
                 if(key == 'simple'){
                     this.new_title = ""
                     this.new_content = ""
                 }
-
                 this.modal[key] = false
             },
-            elementModalActionSimple:function(...arg){
+            childModalActionSimple:function(...arg){
                 let [title, content] = arg
                 this.new_title = title
                 this.new_content = content
-
                 this.modal['simple'] = true
-            }
-
+            },
+            childItemsUpdate:function(obj){
+                this.items[this.data_name] = obj[this.data_name]
+            },
+            getAPIs:async function () {
+                let path = this.$appRootPath + this.$appApiPrefix
+                try {
+                    const res =  await axios.get(path + '/post' ,{params:{api_token:this.token}}).catch(e => { throw 'get1 error '+e.message}),
+                } catch(err) {
+                    console.log(err);
+                }
+                return res.data[this.data_name]
+            },
         },
         created:function(){
             this.items = this.item_obj
@@ -214,7 +222,6 @@
         margin: 0 auto;
         transition: all 0.5s;
     }
-
     section .create {
         backface-visibility: hidden;
         cursor: pointer;
@@ -230,28 +237,21 @@
         background: #367678;
         transition: all 0.2s;
     }
-
         section .create:hover {
-
             transform: scale(1.01);
             filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
         }
-
     section .item_all {
         list-style: none;
-
         display: flex;
         align-items: flex-start;
         justify-content: center;
         flex-wrap: wrap;
-
         width: 100%;
         height: auto;
-
         margin: 0px auto;
         padding: 0px;
     }
-
     /*
         modal
     */
@@ -265,17 +265,13 @@
     {
         transform: translateX(0);
     }
-
     .modal-editer_container,.modal-viewer_container{
         overflow-y: auto;
-
         position:fixed;
         top:0;
         left:0;
         bottom:0;
-
         width: 100%;
         transition: all 0.5s;
     }
-
 </style>
