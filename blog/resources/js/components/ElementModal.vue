@@ -98,8 +98,6 @@
 </template>
 
 <script>
-
-
     export default {
         props: {
             token:String,
@@ -138,6 +136,11 @@
             emitActionSimple: function () {
                 this.$emit('element_modal_action_simple',this.new_title,this.new_content)
             },
+            emitActionItemsUpdate: async function () {
+                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) 
+                const obj = await axios.get(path,{params:{api_token:this.token}}) 
+                this.$emit('items_update', obj )
+            },
             getAPIsPath:function(){
                 let data_id = this.action !== 'create' && this.$isSetable(this.data_id) ? '/' + this.data_id : '';
                 let routePath = this.$route.path
@@ -174,6 +177,7 @@
                     let element = document.getElementById('status_' + this.new_status)
                     element.checked = true
                 }
+                
             },
             EventOn : function(on){
                 const sbar = window.scrollbars.visible
@@ -254,18 +258,23 @@
                     }
 
                     let res
-                    switch(state){
-                        case 'edit':
-                            res = await axios.put(path+'?api_token='+this.token,params)
-                            break;
-                        case 'delete':
-                            res = await axios.delete(path+'?api_token='+this.token)
-                            break;
-                        case 'create':
-                            res = await axios.post(path+'?api_token='+this.token,params)
-                            break;
-                        default:
-                            break;
+                    try{
+                        switch(state){
+                            case 'edit':
+                                res = await axios.put(path+'?api_token='+this.token,params)
+                                break;
+                            case 'delete':
+                                res = await axios.delete(path+'?api_token='+this.token)
+                                break;
+                            case 'create':
+                                res = await axios.post(path+'?api_token='+this.token,params)
+                                break;
+                            default:
+                                break;
+                        }
+                        this.emitActionItemsUpdate()
+                    }catch(error){
+                        throw new RequestFailed(error)
                     }
                 }
                 catch(error){
@@ -487,3 +496,4 @@
 
 
 </style>
+
