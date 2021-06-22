@@ -18,18 +18,18 @@
 </template>
 
 <script>
-// import marked from 'marked';
-// import hljs from 'highlight.js';
-// import 'highlight.js/styles/vs2015.css';
+import marked from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/vs2015.css';
 
-//export default {
-module.exports={
-    // props:{
-    //     content_text:String
-    // },
+export default {
+// module.exports={
+    props:{
+        content_text:String
+    },
     data:function(){
         return{
-            content_text:"",
+            // content_text:"",
             marked_text:"",
             anker_arr:null
         }
