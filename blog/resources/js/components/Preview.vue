@@ -3,33 +3,23 @@
         <!-- <div class="preview_body" v-html="marked_text"></div> -->
         <textarea v-model="content_text"></textarea>
         <div class="preview_body" v-html="marked_text"></div>
-        <ul 
-            id="HtmlAnker"
-            v-if="anker_arr"
-        >
-            <li
-                v-for="item in anker_arr"
-                :key="item"
-            >
-                <a :href="'#' + item">{{ item }}</a>
-            </li>
-        </ul>
     </div>
 </template>
 
 <script>
-import marked from 'marked';
-import hljs from 'highlight.js';
-import 'highlight.js/styles/vs2015.css';
+// import marked from 'marked';
+// import hljs from 'highlight.js';
+// import 'highlight.js/styles/vs2015.css';
 
-export default {
-// module.exports={
+//export default {
+module.exports={
     props:{
-        content_text:String
+        // content_text:String,
+        is_return_dom:{type:[Boolean],default:false}
     },
     data:function(){
         return{
-            // content_text:"",
+            content_text:"",
             marked_text:"",
             anker_arr:null
         }
@@ -37,20 +27,7 @@ export default {
     watch:{
         content_text: function(){
             this.marked_text = this.markedText(this.content_text)
-            const doc = new DOMParser().parseFromString('<div>' + this.marked_text + '</div>', "text/html");
-            const querys = doc.querySelectorAll("h2")
-
-            if(querys.length > 0){
-                let arr = []
-                querys.forEach(query => {
-                    if(query.id !== null && query.id != "" ){
-                        arr.push(query.id)
-                    }
-                });
-                this.anker_arr = arr
-            } else {
-                this.anker_arr = null
-            }
+            if(this.is_return_dom){ this.$emit( 'emit_dom_string' , '<div>' + this.marked_text + '</div>') }
         },
     },
     methods:{
@@ -72,6 +49,7 @@ export default {
             });
             return marked(text)
         },
+
     },
 }
 </script>
