@@ -7,8 +7,7 @@
                 <html-anchor-list
                     v-for="items in autoAnchor"
                     :key="items.id"
-
-                    :item='items'
+                    :item="items"
                     :is_button="is_button"
                 ></html-anchor-list>
             </ul>
@@ -30,74 +29,59 @@ module.exports = {
     },
     computed:{
         autoAnchor:function(){
-            if(this.dom_string !== ''){
-                const doc = new DOMParser().parseFromString(this.dom_string, "text/html");
-                const querys = doc.querySelectorAll(this.query_select)
+            if(this.dom_string === ''){ return null }
+            const doc = new DOMParser().parseFromString(this.dom_string, "text/html")
+            const querys = doc.querySelectorAll(this.query_select)
+            if (querys.length <= 0) { return null }
 
-                // クエリ判定
-                if (querys.length > 0) {
-                    // セレクターの種類を配列に変換し重複を排除する
-                    const queryArrayToSet = this.query_select.split(',')
-                    const queryArray = [...new Set(queryArrayToSet)]
+            const queryArrayToSet = this.query_select.split(',')
+            const queryArray = [...new Set(queryArrayToSet)]
 
-                    // returnする配列の初期化
-                    let resultArr = []
+            const resultArr = []
+            let resultRef = resultArr;
 
-                    // 配列への参照：ネストされるたび参照を代入する
-                    let resultRef = resultArr;
+            const isCreatedArr = []
+            queryArray.forEach(element => {isCreatedArr.push(false)})
 
-                    // 代入先のObjectが作成済みか判定
-                    let isCreatedArr = []
-                    queryArray.forEach(element => {isCreatedArr.push(false)})
+            querys.forEach(query => {
+                if(query.id !== null && query.id !== "" ){
+                    let qTag = query.tagName.toLowerCase()
+                    let nestIndex = queryArray.findIndex(elem => elem == qTag)
 
-                    querys.forEach(query => {
-                        // id無しのエラーが存在する場合は無視
-                        if(query.id !== null && query.id != "" ){
-                            let qTag = query.tagName.toLowerCase()
-                            let nestIndex = queryArray.findIndex(elem => elem == qTag)
+                    // main start
+                    for(let i = 0 ; i < queryArray.length ; i++){
+                        if ( i == nestIndex ) {
+                            resultRef.push({
+                                tag:qTag,
+                                id:query.id,
+                                text:query.innerHTML,
+                                children:[]
+                            })
 
-                            // メイン処理
-                            for(let i = 0 ; i < queryArray.length ; i++){
-                                if ( i == nestIndex ) {
-                                    resultRef.push({
-                                        tag:qTag,
-                                        id:query.id,
-                                        text:query.innerHTML,
-                                        children:[]
-                                    })
-                                    isCreatedArr[i] = true
+                            isCreatedArr[i] = true
+                            resultRef = resultArr
 
-                                    //参照先を初期化
-                                    resultRef = resultArr
-
-                                } else if ( i < nestIndex ) {
-                                    // タグが飛んでる場合（h1の次にh2を飛ばしてh3が来てる等）は空のObjectを作成する
-                                    if(!isCreatedArr[i]){
-                                        resultRef.push({ 
-                                            children:[] 
-                                        })
-                                        isCreatedArr[i] = true
-                                    }
-                                    // 参照先次の入れ子に変更
-                                    resultRef = resultRef[resultRef.length - 1].children
-
-                                } else {
-                                    isCreatedArr[i] = false
-                                }
-
+                        } else if ( i < nestIndex ) {
+                            if(!isCreatedArr[i]){
+                                resultRef.push({ 
+                                    children:[] 
+                                })
+                                isCreatedArr[i] = true
                             }
-                            // メイン処理ここまで
+                            resultRef = resultRef[resultRef.length - 1].children
 
+                        } else {
+                            isCreatedArr[i] = false
                         }
-                    })
 
-                    return resultArr
+                    }
+                    // main end
+
                 }
-                // クエリ判定ここまで
+            })
 
-            }
-
-            return null
+            return resultArr
+            
         }
     },
 }
@@ -172,7 +156,7 @@ module.exports = {
     }
 
     .anchor-button{
-        vertical-align: middle;
+        transition: all 0.3s;
     }
     .anchor-button svg{
         width: 1.5rem;
@@ -183,11 +167,17 @@ module.exports = {
         stroke: inherit;
         fill: inherit;
 
-        transition: all 0.3s;
+        vertical-align: middle;
+
+    }
+
+    .anchor-button > span{
+        color: inherit;
     }
 
     .anchor-button:hover{
-        stroke: blueviolet;
+        color:blueviolet;
+        /* stroke: blueviolet; */
         fill: blueviolet;
     }
 
