@@ -1,0 +1,90 @@
+.flex {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex--{
+    &c {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &-s{
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+    
+        &-e{
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+    }
+
+
+
+    &s{
+        list-style: none;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+
+        &-s{
+            list-style: none;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+    
+        &-e{
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+        }
+    }
+
+    &e{
+        list-style: none;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+
+        &-s{
+            list-style: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+    
+        &-e{
+            list-style: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+    }  
+    
+    &dc{
+        list-style: none;
+        flex-direction: column; 
+         &r{
+            list-style: none;
+            flex-direction: column-reverse; 
+         }
+      }
+  
+    &dr{
+        list-style: none;
+        flex-direction: row; 
+        &r{
+            list-style: none;
+            flex-direction: row-reverse; 
+        }
+    }
+}
