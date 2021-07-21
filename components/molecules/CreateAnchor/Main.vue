@@ -1,26 +1,41 @@
 <template>
   <div
     v-if="autoAnchor"
-    id="HtmlAnchor"
+    class="anchor-list"
   >
-    <keep-alive>
-      <ul class="anchor-ul anchor-level__1">
-        <List
-          v-for="items in autoAnchor"
-          :key="items.id"
-          :item="items"
-          :is-button="isButton"
-        />
-      </ul>
-    </keep-alive>
+    <p class="anchor-list__title">
+      <slot />
+    </p>
+    <ul class="anchor-list__parent anchor-level__1">
+      <List
+        v-for="items in autoAnchor"
+        :key="items.id"
+        :item="items"
+        :is-button="isButton"
+        class="anchor-list__child"
+        keep-alive
+      />
+    </ul>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, VModel } from 'vue-property-decorator'
 import marked from 'marked'
+import { parse } from 'node-html-parser'
 import List from './List.vue'
 import AnchorListObj from './AnchorListObj'
+
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  pedantic: false,
+  gfm: true,
+  breaks: true,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  xhtml: false
+})
 
 @Component({
   components: {
@@ -29,19 +44,19 @@ import AnchorListObj from './AnchorListObj'
 })
 export default class CreateAnchorMainComponent extends Vue {
   @VModel({ type: String, default: '' }) test !: string
-  @Prop({ type: String, default: '' }) readonly domString !: string
+  @Prop({ type: String, default: '' }) readonly content !: string
   @Prop({ type: String, default: 'h1,h2,h3' }) readonly querySelect !: string
   @Prop({ type: Boolean, default: true }) readonly isButton ! : boolean
 
   private domStr () : string {
-    return this.domString === '' ? this.test : this.domString
+    return this.content === '' ? this.test : this.content
   }
 
   protected get autoAnchor () : object | null {
     const domStr : string = this.domStr()
     if (domStr === '') { return null }
-    const doc : Document = new DOMParser().parseFromString(marked(domStr), 'text/html')
-    const nodeList : NodeListOf<Element> = doc.querySelectorAll(this.querySelect)
+    const doc = parse(marked(domStr))
+    const nodeList = doc.querySelectorAll(this.querySelect)
     if (nodeList.length <= 0) { return null }
 
     const querysToSet : Array<string> = this.querySelect.split(',')
@@ -55,7 +70,7 @@ export default class CreateAnchorMainComponent extends Vue {
     querys.forEach(() => { isCreatedIndex.push(false) })
 
     // main start
-    nodeList.forEach((elem : Element) => {
+    nodeList.forEach((elem) => {
       if (!elem.id) { return }
 
       const tag: string = elem.tagName.toLowerCase()
@@ -88,103 +103,92 @@ export default class CreateAnchorMainComponent extends Vue {
 }
 </script>
 
-<style scoped>
-    #HtmlAnchor{
-        background: cadetblue;
+<style lang="scss" scoped>
+  .anchor-list{
+    width: 100%;
+    height: auto;
+
+    padding: 1.6rem;
+
+    line-height: 1.2;
+    word-break: normal;
+
+    &__title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0;
     }
 
-    .anchor-li{
-        color:white;
-        fill: white;
+    &__parent{
+      list-style: none;
+      user-select: none;
+
+      margin-left: 1.4rem;
     }
 
-    .anchor-button:hover{
-        color:blueviolet;
-        /* stroke: blueviolet; */
-        fill: blueviolet;
+    &__child{
+      color:inherit;
+      stroke: none;
+      fill: inherit;
     }
+  }
 
-    #HtmlAnchor{
-        width: 100%;
-        height: auto;
+  .anchor-level {
+    &__1 {
+      margin: 0;
+      font-size: 1.8rem ;
 
-        padding: 1.6rem;
-
-        word-break: normal;
-    }
-
-    /* .anchor-li{
-        margin-top: 0.2rem;
-    } */
-
-    .anchor-ul{
-        list-style: none;
-        user-select: none;
-
-        margin-left: 1.4rem;
-    }
-
-    .anchor-ul a{
-        cursor: pointer;
-        word-break: break-word;
-    }
-
-    .anchor-level__1{
-        margin: 0;
-        font-size: 1.8rem ;
-    }
-    .anchor-level__1 > li {
+      > li {
         margin-top: 0.6rem;
-    }
-    .anchor-level__1 > li:first-child {
-        margin-top: 0;
-    }
-
-    .anchor-level__1 > li > span.wrapper{
-        display: inline-block;
-        width: 100%;
-
-        border-bottom: dotted 1px;
-    }
-    .anchor-level__1 > li > span.wrapper a{
-        margin-left: 1rem;
+        &:first-child{margin-top: 0;}
+        > span.wrapper {
+          display: inline-block;
+          width: 100%;
+          border-bottom: dotted 1px;
+          a{ margin-left: 1rem; }
+        }
+      }
     }
 
-    .anchor-level__2{
-        list-style: disc;
-        margin-left: 3.6rem;
-        font-size: 1.6rem ;
+    &__2 {
+      list-style: disc;
+      margin-left: 3.6rem;
+      font-size: 1.6re ;
+
+      > li { margin-top: 0.5rem;}
     }
 
-    .anchor-level__2 > li {
-        margin-top: 0.5rem;
-    }
+    &__3 {
+      list-style: circle;
+      margin-left:1.8rem;
+      font-size:1.4rem;
 
-    .anchor-level__3{
-        list-style: circle;
-        margin-left: 1.8rem;
-        font-size: 1.4rem ;
+      > li { margin-top: 0.4rem;}
     }
-    .anchor-level__3 > li {
-        margin-top: 0.4rem;
+  }
+
+  .anchor-list__parent::v-deep {
+    stroke:none !important;
+
+    a{
+      cursor: pointer;
+      word-break: break-word;
     }
 
     .anchor-button{
-        transition: all 0.3s;
+      transition: all 0.3s;
     }
     .anchor-button svg{
-        width: 1.5rem;
-        height: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
 
-        margin-left: 0.35rem;
+      margin-left: 0.35rem;
 
-        stroke: inherit;
-        fill: inherit;
+      stroke: inherit;
+      fill: inherit;
 
-        vertical-align: middle;
-
+      vertical-align: middle;
     }
-
     .anchor-button > span{
         color: inherit;
     }
@@ -200,4 +204,5 @@ export default class CreateAnchorMainComponent extends Vue {
         transform: translateX(1rem);
         opacity: 0;
     }
+  }
 </style>

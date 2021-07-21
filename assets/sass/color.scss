@@ -23,6 +23,15 @@ a{
     {color: $color;}
 }
 
+.cl-white{
+    background: white;
+    $color:$text-dark;
+
+    color: $color;
+    fill:$color;
+    stroke: $color;
+}
+
 .cl-base{
     background: $base;
     $color:$text-light;

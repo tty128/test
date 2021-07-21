@@ -9,7 +9,7 @@
       <aside id="MainNav">
         <OrganismsNavigationUL />
       </aside>
-      <Nuxt />
+      <Nuxt id="Content" />
     </main>
     <footer id="Footer">
       <OrganismsDefaultFooter
@@ -30,7 +30,17 @@ export default class DefaultLayoutComponent extends Vue {
 </script>
 
 <style lang="scss">
-#Header{
-
+#Main{
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+#MainNav {
+  max-width: 150px;
+  flex-grow: 1;
+}
+#Content {
+  flex-grow: 1;
+  margin-right: 2rem;
 }
 </style>

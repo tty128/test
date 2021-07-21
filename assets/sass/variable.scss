@@ -5,70 +5,30 @@
     justify-content: center;
 }
 
+@mixin flex-config($align:center){
+    list-style: none;
+    display: flex;
+    align-items: $align;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    &-s,&-e,&-b,&-a{
+        list-style: none;
+        display: flex;
+        align-items: $align;
+        flex-wrap: wrap;
+    }
+
+    &-s{justify-content: flex-start;}
+    &-e{justify-content: flex-end;}
+    &-b{justify-content: space-between;}
+    &-a{justify-content: space-around;}   
+}
+
 .flex--{
-    &c {
-        list-style: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &-s{
-            list-style: none;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-        }
-    
-        &-e{
-            list-style: none;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-    }
-
-
-
-    &s{
-        list-style: none;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-
-        &-s{
-            list-style: none;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-        }
-    
-        &-e{
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-end;
-        }
-    }
-
-    &e{
-        list-style: none;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-
-        &-s{
-            list-style: none;
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-start;
-        }
-    
-        &-e{
-            list-style: none;
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-end;
-        }
-    }  
+    &c { @include flex-config(center) }
+    &s{ @include flex-config(flex-start) }
+    &e{ @include flex-config(flex-end) }  
     
     &dc{
         list-style: none;
