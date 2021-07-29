@@ -1,6 +1,7 @@
 <template>
-  <div>
-    aaaaaa
+  <div class="top-page flex--c flex--dc">
+    <div>ここはポートフォリオのページ</div>
+    <p>aaaaaa</p>
   </div>
 </template>
 
@@ -14,3 +15,10 @@ export default class YourComponent extends Vue {
   protected get getAppName (): string { return this.appName }
 }
 </script>
+
+<style lang="scss">
+.top-page {
+  width: 100%;
+  height: 100%;
+}
+</style>

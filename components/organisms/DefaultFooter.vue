@@ -1,6 +1,6 @@
 <template>
-  <div class="footer cl-base flex--c-s">
-    <div class="footer__app-name flex">
+  <div class="footer">
+    <div class="footer__app-name">
       <NuxtLink to="/">
         {{ getAppName }}
       </NuxtLink>
@@ -8,6 +8,9 @@
     <div class="footer__navigation">
       <OrganismsNavigationUL />
     </div>
+    <p class="footer__copyright">
+      ©2021 Portfolio. All rights reserved.
+    </p>
   </div>
 </template>
 
@@ -23,7 +26,18 @@ export default class DefaultHeaderComponent extends Vue {
 </script>
 
 <style lang="scss">
-#Header {
-  background: red;
+.footer{
+  padding: 2rem;
+
+  &__app-name {
+    & > a {
+      font-size: 3rem;
+      text-decoration: none;
+    }
+  }
+  &__copyright {
+    font-size: 1rem;
+    margin-left: auto;
+  }
 }
 </style>

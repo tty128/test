@@ -1,11 +1,12 @@
 <template>
-  <div id="Page">
+  <div id="Page" class="cl-base">
     <header id="Header">
       <OrganismsDefaultHeader
+        class="cl-primary flex--c-s"
         :app-name="getAppName"
       />
     </header>
-    <main id="Main">
+    <main id="Main" class="cl-base--r">
       <aside id="MainNav">
         <OrganismsNavigationUL />
       </aside>
@@ -13,6 +14,7 @@
     </main>
     <footer id="Footer">
       <OrganismsDefaultFooter
+        class="cl-base flex--s-s flex--dc"
         :app-name="getAppName"
       />
     </footer>
@@ -30,6 +32,9 @@ export default class DefaultLayoutComponent extends Vue {
 </script>
 
 <style lang="scss">
+body {
+  background: #454f45;
+}
 #Main{
   position: relative;
   display: flex;
@@ -41,6 +46,6 @@ export default class DefaultLayoutComponent extends Vue {
 }
 #Content {
   flex-grow: 1;
-  margin-right: 2rem;
+  margin: 2rem;
 }
 </style>

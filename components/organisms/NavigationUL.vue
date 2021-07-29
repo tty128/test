@@ -22,7 +22,8 @@ export default class NavigationULComponent extends Vue {
   @Prop({ type: String, default: '' }) readonly liClass ! : string
   public paths : object = [
     'about',
-    'blog'
+    'blog',
+    'taxonomy'
   ]
 
   protected get getLiClass () : string { return this.liClass }

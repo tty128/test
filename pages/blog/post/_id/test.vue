@@ -14,15 +14,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component } from 'nuxt-property-decorator'
 
-@Component({
-  async asyncData ({ params, $axios }) {
+@Component
+export default class BlogPageComponent extends Vue {
+  async asyncData ({ params, $axios }:{ params: any, $axios: any }) {
     const data = await $axios.$get('/api/page2/index2.php?id=' + params.id)
     return { data }
   }
-})
-export default class BlogPageComponent extends Vue {
+
   value :string = ''
 }
 </script>

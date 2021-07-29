@@ -1,5 +1,5 @@
 <template>
-  <div class="header cl-primary flex--c-s">
+  <div class="header">
     <div class="header__app-name flex">
       <NuxtLink to="/">
         {{ getAppName }}

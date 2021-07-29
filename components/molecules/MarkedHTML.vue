@@ -84,23 +84,23 @@ export default class MarkedHTMLComponent extends Vue {
   }
 
   // *******
-  //  font
+  //  font (基本的なサイズは@assetのグローバルCSSを適用する)
   // *******
   h1 {
-      font-size: 4.8rem;
+      // font-size: 4.8rem;
   }
 
   h2 {
-      font-size: 3.6rem;
+      // font-size: 3.6rem;
       border-bottom: solid 1px;
   }
 
   h3 {
-      font-size: 2.4rem;
+      // font-size: 2.4rem;
   }
 
   * {
-      font-size: 1.6rem;
+      // font-size: 1.6rem;
   }
 
   ul, ol, dl {

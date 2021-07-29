@@ -6,7 +6,9 @@
     <AtomsImage :src="getImgUrl" />
     <div class="card-design__info">
       <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-      <h2 class="card-design__info--title"><slot /></h2>
+      <h2 class="card-design__info--title">
+        <slot />
+      </h2>
       <p v-if="getDesc" class="card-design__info--desc">
         {{ getDesc }}
       </p>
@@ -15,6 +17,9 @@
         <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
         <p v-if="getDate[1]">{{ getDate[1] }}</p>
       </div>
+      <AtomsTermButton class="card-design__info--category" :prefix="'/taxonomy/category/' + getCategory.toLowerCase()">
+        {{ getCategory }}
+      </AtomsTermButton>
     </div>
   </NuxtLink>
 </template>
@@ -26,7 +31,8 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 export default class CardComponent extends Vue {
   @Prop({ type: String, default: 'column' }) readonly design ! :string
   @Prop({ type: String, default: './post/' }) readonly prefix ! :string
-  @Prop({ type: [String, Number] }) readonly id ! :string | number
+  @Prop({ type: String, default: 'uncategorized' }) readonly category ! :string
+  @Prop({ type: [String, Number], default: '' }) readonly id ! :string | number
   @Prop() readonly imgUrl? :string
   @Prop() readonly desc? : string | [string, number] | [string, number, string]
   @Prop() readonly date? : string | [string, string]
@@ -78,6 +84,10 @@ export default class CardComponent extends Vue {
     } else {
       return [this.date[0], this.date[1]]
     }
+  }
+
+  protected get getCategory () : string {
+    return this.category
   }
 }
 </script>
@@ -137,5 +147,6 @@ export default class CardComponent extends Vue {
     width: 100%;
     height: 100%;
   }
+
 }
 </style>

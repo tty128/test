@@ -105,7 +105,6 @@ export default class CreateAnchorMainComponent extends Vue {
 
 <style lang="scss" scoped>
   .anchor-list{
-    width: 100%;
     height: auto;
 
     padding: 1.6rem;
