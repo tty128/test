@@ -54,8 +54,8 @@ Vue.mixin({
 
 
 Vue.prototype.$appRootPath = '';
-const vue_route_path = '/manage';
-Vue.prototype.$appApiPrefix = '/api';
+const vue_route_path = '/';
+Vue.prototype.$appApiPrefix = '/api/manage';
 
 
 Vue.prototype.$appPath = vue_route_path;

@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class TermTableSeeder extends Seeder
+class PostTermTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,16 +11,16 @@ class TermTableSeeder extends Seeder
      */
     public function run()
     {
-        App\Term::create(
+        App\PostTerm::create(
             [
-                'taxonomy_id'=>2,
-                'name' => 'hand',
+                'post_id' => 1,
+                'term_id' => 1,
             ]
         );
-        App\Term::create(
+        App\PostTerm::create(
             [
-                'taxonomy_id' => 1,
-                'name' => 'body',
+                'post_id' => 1,
+                'term_id' => 2,
             ]
         );
     }

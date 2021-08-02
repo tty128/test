@@ -11,37 +11,29 @@ class Post extends Model
     use SoftDeletes;
 
     protected $table = 'post';
-    protected $primaryKey = 'post_id';
-
-    protected $hidden = [
-        'post_password'
-    ];
+    // protected $primaryKey = 'post_id';
+    protected $hidden = array('pivot');
 
     protected $fillable = [
-        'post_author',
-        'post_status',
-        'post_title',
-        'post_content',
+        'author',
+        'status',
+        'title',
+        'body',
+        'category'
     ];
 
-    public function author()
-    {
-        return $this->belongsTo('App\User', 'post_author','user_id');
+    public function terms() {
+        return $this->belongsToMany('App\Term');
     }
 
-    public function updateAuthor()
+    public function getAuthorAttribute($value)
     {
-        return $this->belongsTo('App\User', 'post_update_author', 'user_id');
+        return User::find($value)->name;
     }
 
-    public function postmeta()
+    public function getUpdateAuthorAttribute($value)
     {
-        return $this->hasOne('App\PostMeta','post_id');
-    }
-
-    public function termRelationship()
-    {
-        return $this->belongsToMany('App\TermTaxonomy','term_relationship','post_id','term_taxonomy_id');
+        return isset($value) ? User::find($value)->name : null;
     }
 
     public static function boot()
@@ -50,13 +42,13 @@ class Post extends Model
         self::creating(function ($q) {
             if(Auth::check()){
                 $user_id = Auth::id();
-                $q->post_author = $user_id;
+                $q->author = $user_id;
             }
         });
         self::updating(function ($q) {
             if (Auth::check()) {
                 $user_id = Auth::id();
-                $q->post_update_author = $user_id;
+                $q->update_author = $user_id;
             }
         });
     }

@@ -14,10 +14,10 @@
 @endsection
 
 @section('main')
-    <laravel-main-handle
+    <laravel-main
         token="{{Auth::user()->api_token}}"
         :obj="{{ json_encode([
-                'post' => $post,
+                'post' => $post['post'],
                 'term' => $term
             ]) }}"
     />

@@ -18,19 +18,19 @@ class PostController extends Controller
     {
         $auth_id = isset($request->user()->id) ? $request->user()->id : Auth::id();
         $post = $post
-            ->where('post_author', '=', $auth_id)
-            ->orWhere('post_status', '<>', 'private')
-            ->orderBy('post.created_at', 'desc')
-            ->join('users as pca', 'post_author', '=', 'pca.id')
-            ->leftJoin('users as pua', 'post_update_author', '=', 'pua.id')
+            ->where('author', '=', $auth_id)
+            ->orWhere('status', '<>', 'private')
+            ->orderBy('post.id', 'desc')
+            ->join('users as pca', 'author', '=', 'pca.id')
+            ->leftJoin('users as pua', 'update_author', '=', 'pua.id')
             ->get([
-                'post_id',
+                'post.id',
                 'post.created_at',
                 'post.updated_at',
-                'post_status',
-                'post_title',
-                'pca.name as post_author_name',
-                'pua.name as post_update_author_name',
+                'status',
+                'title',
+                'pca.name as author_name',
+                'pua.name as update_author_name',
             ]);
 
         return ['post' => $post];
@@ -56,12 +56,12 @@ class PostController extends Controller
      */
     public function show(Request $request, Post $post)
     {
-        switch ($post->post_status) {
+        switch ($post->status) {
             case 'public':
                 return $post;
 
             case 'private':
-                return $request->user()->id == $post->post_author ? $post : ['error' => '記事は非公開です'];
+                return $request->user()->id == $post->author ? $post : ['error' => '記事は非公開です'];
 
             case 'member':
                 return isset($request->user()->id) ? $post : redirect()->route('login');
@@ -112,8 +112,8 @@ class PostController extends Controller
     public function runCheck(Request $request, Post $post)
     {
         if (isset($post, $request)) {
-            $creater = $post->post_author === $request->user()->id ? true : false;
-            $status = $post->post_status !== 'private' ? true : false;
+            $creater = $post->author === $request->user()->id ? true : false;
+            $status = $post->status !== 'private' ? true : false;
             if ($status || $creater) {
                 return true;
             }

@@ -137,14 +137,13 @@
                 this.$emit('element_modal_action_simple',this.new_title,this.new_content)
             },
             emitActionItemsUpdate: async function () {
-                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) 
-                const obj = await axios.get(path,{params:{api_token:this.token}}) 
+                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix)
+                const obj = await axios.get(path,{params:{api_token:this.token}})
                 this.$emit('items_update', obj )
             },
             getAPIsPath:function(){
                 let data_id = this.action !== 'create' && this.$isSetable(this.data_id) ? '/' + this.data_id : '';
-                let routePath = this.$route.path
-                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix) + data_id
+                let path = this.$appRootPath + this.$appApiPrefix + '/' + this.data_name + data_id
                 return path
             },
             getAPIs:async function(){
@@ -159,9 +158,8 @@
                     // create以外の時のaxios通信
                     const path = this.getAPIsPath()
                     try{
-                        const response = await axios.get(path ,{params:{api_token:this.token}})
-                        this.items = response.data
-
+                        const { data } = await axios.get(path ,{params:{api_token:this.token}})
+                        this.items = data
                         this.notCreatedAction()
                     }
                     catch(error){
@@ -177,7 +175,7 @@
                     let element = document.getElementById('status_' + this.new_status)
                     element.checked = true
                 }
-                
+
             },
             EventOn : function(on){
                 const sbar = window.scrollbars.visible
@@ -222,9 +220,9 @@
             notCreatedAction:function(){
                 switch(this.data_name){
                     case 'post':
-                        this.new_title = this.old_title = this.items.post_title
-                        this.new_content = this.items.post_content
-                        this.new_status = this.items.post_status
+                        this.new_title = this.old_title = this.items.title
+                        this.new_content = this.items.body
+                        this.new_status = this.items.status
                         break;
                     case 'term':
                         this.new_title = this.old_title = this.term_name
@@ -244,15 +242,15 @@
                             // laravelでもvalidateしているがここでも想定外のstatusをデフォルトの値に修正する
                             this.new_status = this.new_status === 'private' || this.new_status === 'member' || this.new_status === 'public' ? this.new_status : 'private'
                             params = {
-                                post_title:this.new_title,
-                                post_content:this.new_content,
-                                post_status:this.new_status,
+                                title:this.new_title,
+                                body:this.new_content,
+                                status:this.new_status,
                             }
                             break;
 
                         case 'term':
                             params = {
-                                post_title:this.new_title,
+                                name:this.new_title,
                             }
                             break;
                     }

@@ -7,17 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Term extends Model
 {
     protected $table = 'term';
-    protected $primaryKey = 'term_id';
+    // protected $primaryKey = 'term_id';
     public $timestamps = false;
+    protected $hidden = array('pivot');
 
     protected $fillable = [
-        'term_name',
-        'term_taxonomy_id',
-        'term_group',
+        'name',
+        'taxonomy_id',
     ];
 
-    public function termTaxonomy()
+    public function posts() {
+        return $this->belongsToMany('App\Post');
+    }
+
+    public function taxonomy()
     {
-        return $this->belongsTo('App\TermTaxonomy');
+        return $this->belongsTo('App\Taxonomy');
     }
 }

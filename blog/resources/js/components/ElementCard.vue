@@ -30,8 +30,8 @@
 </template>
 
 <script>
-    // export default {
-    module.exports={
+    export default {
+    // module.exports={
         props: {
             created_at: {type:[String],default:'1111-01-01'},
             updated_at: {type:[String],default:'1111-01-01'},

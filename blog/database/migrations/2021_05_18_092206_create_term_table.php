@@ -14,10 +14,9 @@ class CreateTermTable extends Migration
     public function up()
     {
         Schema::create('term', function (Blueprint $table) {
-            $table->bigIncrements('term_id');
-            $table->bigInteger('term_taxonomy_id');
-            $table->string('term_name',200);
-            $table->bigInteger('term_group')->nullable();
+            $table->bigIncrements('id');
+            $table->bigInteger('taxonomy_id');
+            $table->string('name',200);
         });
     }
 

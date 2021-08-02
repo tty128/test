@@ -26,16 +26,16 @@
             >
                 <li
                     v-for="item in limitArray"
-                    :key="item.post_id"
+                    :key="item.id"
                     class="item_body"
                 >
                     <laravel-element-card
                         @element_card_action="childCardAction"
-                        :created_at = "item.created_at"
-                        :updated_at = "item.updated_at"
-                        :status = "item.post_status"
-                        :name = "item.post_title"
-                        :id = "item.post_id"
+                        :created_at="item.created_at"
+                        :updated_at="item.updated_at"
+                        :status="item.status"
+                        :name="item.title"
+                        :id="item.id"
                     ></laravel-element-card>
                 </li>
             </ul>
@@ -50,11 +50,9 @@
                 >
                     <laravel-element-card
                         @element_card_action="childCardAction"
-                        :created_at = "item.created_at"
-                        :updated_at = "item.updated_at"
-                        status = "public"
-                        :name = "item.term_name"
-                        :id = "item.term_id"
+                        status="public"
+                        :name="item.name"
+                        :id="item.id"
                     ></laravel-element-card>
                 </li>
             </ul>
@@ -120,16 +118,16 @@
     export default {
         props: {
             token: String,
-            item_obj: Object,
-            data_name:String
+            obj: Object,
         },
         components:{
             SimpleModal
         },
         data: function () {
             return {
-                items:null,
-                paginate_max_pages:5,
+                items: null,
+                data_name: String,
+                paginate_max_pages: 5,
                 limits:[12,24,36],
                 limit: 12,
                 modal:{
@@ -143,20 +141,21 @@
                 new_content:"",
             }
         },
+        watch:{
+            $route(to,from){
+                this.changeItemObj(to.path)
+                console.log(this.items)
+            }
+        },
         computed:{
             currentPage:function(){
-                // query params['page']が Number ならそのまま取得し、それ以外なら1を返す
-                return (typeof(this.$route.query.page) == 'object' || typeof(this.$route.query.page) === "undefined") ? 1 : Number(this.$route.query.page)
+                return isNaN(Number(this.$route.query.page)) ? 1 : Number(this.$route.query.page)
             },
             lastPage:function(){
-                // 最大ページ数を返す(itemsが存在しない場合は0を返す)
-                return this.items[this.data_name] == null ? 0 : Math.ceil(this.items[this.data_name].length / this.limit)
+                return this.items ? Math.ceil(this.items.length / this.limit) : 0
             },
             limitArray:function(){
-                // 現在ページで表示するitemの配列をリミット数以下で返す
-                let item =this.items[this.data_name]
-                let current_page = this.currentPage
-                return item.slice( (current_page - 1) * this.limit , current_page * this.limit )
+                return this.obj[this.data_name].slice((this.currentPage - 1) * this.limit , this.currentPage * this.limit )
             },
         },
         methods: {
@@ -195,15 +194,29 @@
             getAPIs:async function () {
                 let path = this.$appRootPath + this.$appApiPrefix
                 try {
-                    const res =  await axios.get(path + '/post' ,{params:{api_token:this.token}}).catch(e => { throw 'get1 error '+e.message}),
+                    const res =  await axios.get(path + '/post' ,{params:{api_token:this.token}}).catch(e => { throw 'get1 error '+e.message})
                 } catch(err) {
                     console.log(err);
                 }
                 return res.data[this.data_name]
             },
+            changeItemObj: function(path){
+                this.items = null
+                Object.keys(this.obj).forEach(key =>{
+                    if(path.includes(key)){
+                        this.data_name = key
+                        this.items = this.obj[key]
+                    }
+                })
+
+                if(!this.items){
+                    this.data_name = Object.keys(this.obj)[0]
+                    this.items = this.obj[this.data_name]
+                }
+            }
         },
         created:function(){
-            this.items = this.item_obj
+            this.changeItemObj(this.$route.path)
         }
     }
 </script>

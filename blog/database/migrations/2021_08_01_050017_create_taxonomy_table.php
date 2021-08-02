@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTermRelationshipsTable extends Migration
+class CreateTaxonomyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreateTermRelationshipsTable extends Migration
      */
     public function up()
     {
-        Schema::create('term_relationships', function (Blueprint $table) {
-            $table->bigInteger('post_id');
-            $table->bigInteger('term_taxonomy_id');
-
-            $table->unique(['post_id', 'term_taxonomy_id']);
+        Schema::create('taxonomy', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name', 200);
         });
     }
 
@@ -28,6 +26,6 @@ class CreateTermRelationshipsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('term_relationships');
+        Schema::dropIfExists('taxonomy');
     }
 }

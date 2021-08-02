@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Front;
 
 use App\Term;
+use App\Http\Controllers\Controller;
 use App\Taxonomy;
-use Doctrine\DBAL\Schema\Index;
 use Illuminate\Http\Request;
 
 class TermController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
@@ -18,22 +17,10 @@ class TermController extends Controller
     public function index(Term $term)
     {
         return $term
-            ->join('taxonomy as tx', 'taxonomy_id', '=', 'tx.id')
+            ->orderBy('name')
             ->get([
-                'term.id',
-                'term.name',
-                'tx.name as taxonomy_name'
+                'name',
             ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -42,9 +29,9 @@ class TermController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,Term $term,TermTaxonomy $term_taxonomy)
+    public function store(Request $request)
     {
-        Term::create($request->all());
+        //
     }
 
     /**
@@ -53,18 +40,7 @@ class TermController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Term $term)
-    {
-        return $term;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function show($id)
     {
         //
     }
@@ -76,9 +52,9 @@ class TermController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Term $term)
+    public function update(Request $request, $id)
     {
-        $term->update($request->all());
+        //
     }
 
     /**
@@ -87,8 +63,8 @@ class TermController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Term $term)
+    public function destroy($id)
     {
-        $term->delete();
+        //
     }
 }

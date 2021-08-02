@@ -14,16 +14,14 @@ class CreatePostTable extends Migration
     public function up()
     {
         Schema::create('post', function (Blueprint $table) {
-            $table->bigIncrements('post_id');
-            $table->unsignedBigInteger('post_author')->default(0);
-            $table->unsignedBigInteger('post_update_author')->nullable();
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('author')->default(0);
+            $table->unsignedBigInteger('update_author')->nullable();
             $table->timestamps(0);
-            $table->text('post_title');
-            $table->longText('post_content');
-            $table->string('post_status',20)->default('private');
-            $table->string('post_password', 16)->nullable();
-            $table->string('post_name', 200)->nullable();
-            $table->unsignedBigInteger('post_parent')->nullable();
+            $table->text('title');
+            $table->longText('body');
+            $table->string('status',20)->default('private');
+            $table->string('category', 64)->default('uncategorized');
             $table->softDeletes();
         });
     }

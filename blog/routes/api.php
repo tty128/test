@@ -12,13 +12,12 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('post', 'Front\PostController@index');
+Route::get('post/{post}', 'Front\PostController@show');
+Route::get('term-taxonomy', 'Front\TermTaxonomyController@index');
+Route::get('term-taxonomy/{taxonomy}/{name}', 'Front\TermTaxonomyController@show');
 
-Route::post('login', 'API\UserController@login')->name('api_login');
-Route::post('register', 'API\UserController@register')->name('api_register');
-
-Route::middleware('auth:api')->get('details', 'API\UserController@details');
-//Route::get('/post', 'PostController@apiIndex')->name('posts');
-Route::group(['middleware' => 'auth:api'],function () {
-    Route::apiResource('post', 'PostController');
-    Route::apiResource('term', 'TermController');
+Route::group(['prefix'=>'manage','middleware' => 'auth:api'],function () {
+    Route::apiResource('/post', 'PostController');
+    Route::apiResource('/term', 'TermController');
 });

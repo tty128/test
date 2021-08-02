@@ -19,9 +19,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
-
-Route::group(['prefix' =>'manage', 'middleware' => ['auth']],function () {
+Route::group(['prefix' =>'', 'middleware' => ['auth']],function () {
     Route::get('{any?}', function() {
         $post = app()->make('App\Http\Controllers\PostController')->
                 index(
@@ -30,9 +28,13 @@ Route::group(['prefix' =>'manage', 'middleware' => ['auth']],function () {
                 );
         $term = app()->make('App\Http\Controllers\TermController')->
                 index(
-                    app()->make('App\Term'),
-                    app()->make('App\TermTaxonomy')
+                    app()->make('App\Term')
                 );
         return view('manage', compact('post', 'term'));
     })->where('any', '.*');
 });
+
+// Route::get(
+//     '{uri}',
+//     '\\' . Pallares\LaravelNuxt\Controllers\NuxtController::class
+// )->where('uri', '.*');

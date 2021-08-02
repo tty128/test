@@ -1,136 +1,222 @@
 <template>
     <section>
-
-        <h1>{{ items.data[200] }}</h1>
+        <!-- PageTop UI -->
         <div
-             class="post_create"
-             @click ="elementCardAction(null,'create')"
+             class="create"
+             @click ="childCardAction(null,'create','editer')"
         >
-            Create New Post
+            Create New {{ this.data_name.toUpperCase() }}
         </div>
 
-        <laravel-pagination
-            :last_page = "items.last_page"
-            :current_page = "items.current_page"
-        ></laravel-pagination>
+        <laravel-pagination-limit
+            @element_limit_action="childLimitAction"
+            :limits="limits"
+        ></laravel-pagination-limit>
 
-        <ul class='post_all'>
-            <li
-                v-for="item in items.data"
-                :key="item.post_id"
-                class="post_body"
+        <laravel-pagination
+            :last_page="lastPage"
+            :max_view_pages="paginate_max_pages"
+        ></laravel-pagination>
+        <!-- PageTop UI End -->
+
+        <!-- itemBody -->
+        <transition name="main-list" mode="out-in" appear>
+            <ul class='item_all'
+                v-if="data_name == 'post'"
             >
-                <laravel-element-card
-                    @element_card_action="elementCardAction"
-                    :created_at = "item.created_at"
-                    :updated_at = "item.updated_at"
-                    :status = "item.post_status"
-                    :name = "item.post_title"
-                    :id = "item.post_id"
-                ></laravel-element-card>
-            </li>
-        </ul>
+                <li
+                    v-for="item in limitArray"
+                    :key="item.post_id"
+                    class="item_body"
+                >
+                    <laravel-element-card
+                        @element_card_action="childCardAction"
+                        :created_at = "item.created_at"
+                        :updated_at = "item.updated_at"
+                        :status = "item.status"
+                        :name = "item.title"
+                        :id = "item.id"
+                    ></laravel-element-card>
+                </li>
+            </ul>
 
+            <ul class='item_all'
+                v-if="data_name == 'term'"
+            >
+                <li
+                    v-for="item in limitArray"
+                    :key="item.term_id"
+                    class="item_body"
+                >
+                    <laravel-element-card
+                        @element_card_action="childCardAction"
+                        status = "public"
+                        :name = "item.name"
+                        :id = "item.id"
+                    ></laravel-element-card>
+                </li>
+            </ul>
+        </transition>
+        <!-- itemBody End-->
+
+        <!-- PageFooter UI -->
         <laravel-pagination
-            :last_page = "items.last_page"
-            :current_page = "items.current_page"
+            :last_page="lastPage"
+            :max_view_pages="paginate_max_pages"
         ></laravel-pagination>
+        <!-- PageFooter UI End -->
 
-        <laravel-modal
-            :event_on="modal"
-            :token="token"
-            :action="modal_action"
-            :post_id="modal_post_id"
-            @element_modal_action="elementModalAction"
-        ></laravel-modal>
+        <!-- Fixed Element -->
+        <transition name="modal-editer" appear>
+            <div
+                class="modal-editer_container"
+                v-if="modal.editer"
+            >
+                <laravel-modal
+                    @element_modal_action="childModalAction('editer')"
+                    @element_modal_action_simple="childModalActionSimple"
+                    @items_update="childItemsUpdate"
+                    :token="token"
+                    :action="modal_action"
+                    :data_id="modal_post_id"
+                    :data_name="data_name"
+                ></laravel-modal>
+            </div>
+        </transition>
+
+        <transition name="modal-viewer" appear>
+            <div
+                class="modal-viewer_container"
+                v-if="modal.viewer"
+            >
+                <laravel-modal
+                    @element_modal_action="childModalAction('viewer')"
+                    :token="token"
+                    action='preview'
+                    :data_id="modal_post_id"
+                    :data_name="data_name"
+                ></laravel-modal>
+            </div>
+            <div
+                class="modal-viewer_container"
+                v-if="modal.simple"
+            >
+                <simple-modal
+                    @element_modal_action="childModalAction('simple')"
+                    action="preview"
+                    :title="new_title"
+                    :content="new_content"
+                />
+            </div>
+        </transition>
+        <!-- Fixed Element End -->
     </section>
 </template>
 
 <script>
-
+    import SimpleModal from './ElementSimpleModal.vue'
     export default {
         props: {
-            token: String
+            token: String,
+            item_obj: Array,
+            data_name:String
+        },
+        components:{
+            SimpleModal
         },
         data: function () {
             return {
-                items: null,
-                pages: null,
-                limit: 500,
-                query: 0,
-                modal:false,
+                items:null,
+                paginate_max_pages:5,
+                limits:[12,24,36],
+                limit: 12,
+                modal:{
+                    editer:false,
+                    viewer:false,
+                    simple:false
+                },
                 modal_post_id:null,
                 modal_action:null,
+                new_title:"",
+                new_content:"",
             }
         },
-        beforeRouteUpdate(to, from, next) {
-            this.pages = to.query.page
-            this.getAPIs()
-            next()
-        },
-        watch:{
-            modal : function(on){
-                if(on){
-                    const ws = -1 * window.scrollY
-                    document.body.style.position = 'fixed'
-                    document.body.style.top = ws +'px'
-                    document.body.style.width = '100%'
-                    document.body.style.paddingRight = '15px'
-                }
-                else{
-                    const top = document.body.style.top
-                    document.body.style.position = ''
-                    document.body.style.top = ''
-                    document.body.style.width = ''
-                    document.body.style.paddingRight = ''
-                    window.scrollTo(0, parseInt(top , '0') * -1)
-                    this.getAPIs()
-                }
-
-            }
+        computed:{
+            currentPage:function(){
+                return this.$route.query.page ? 1 : Number(this.$route.query.page)
+            },
+            lastPage:function(){
+                return this.items[this.data_name] == null ? 0 : Math.ceil(this.items[this.data_name].length / this.limit)
+            },
+            limitArray:function(){
+                this.items = this.item_obj
+                return this.items.slice( (this.currentPage - 1) * this.limit , this.currentPage * this.limit )
+            },
         },
         methods: {
-            elementCardAction: function(...arg){
-                let [id, action] = arg
-                this.modal_post_id=id
-                this.modal_action=action
-
-                this.modal = true
+            childLimitAction:function(num){
+                // Component:PaginateLimitButtonから戻ってきた数値を変数に代入する
+                this.limit = num
             },
-            elementModalAction:function (modal_switch){
-                this.modal = modal_switch
+            childCardAction: function(...arg){
+                // Component:ElementCardから戻ってきたidおよびaction名を各変数に代入（modalで使用）する
+                // その後、modalを起動
+                let [id, action,key] = arg
+                this.modal_post_id=id
+                if(action != 'preview'){
+                    this.modal_action=action
+                }
+                this.modal[key] = true
+            },
+            childModalAction:function (key){
+                // Component:ElementModalから戻ってきたBoolean（基本false）
+                // Modalで自身を閉じるための関数
+                if(key == 'simple'){
+                    this.new_title = ""
+                    this.new_content = ""
+                }
+                this.modal[key] = false
+            },
+            childModalActionSimple:function(...arg){
+                let [title, content] = arg
+                this.new_title = title
+                this.new_content = content
+                this.modal['simple'] = true
+            },
+            childItemsUpdate:function(obj){
+                this.items[this.data_name] = obj[this.data_name]
             },
             getAPIs:async function () {
-                let routePath = this.$route.path
-                let path = this.$appRootPath + routePath.replace(this.$appPath , this.$appApiPrefix)
-
-                const response = await axios
-                    .get(path ,{params:
-                        {
-                            page:this.pages,
-                            limit:this.limit,
-                            api_token:this.token
-                        }
-                    })
-
-                this.items = response.data
-            }
+                let path = this.$appRootPath + this.$appApiPrefix
+                try {
+                    const res =  await axios.get(path + '/post' ,{params:{api_token:this.token}}).catch(e => { throw 'get1 error '+e.message})
+                } catch(err) {
+                    console.log(err);
+                }
+                return res.data[this.data_name]
+            },
         },
-        created: function () {
-            this.pages = this.$route.query.page
-            this.getAPIs()
+        created:function(){
+            this.items = this.item_obj
         }
-
-
     }
 </script>
 
 <style scoped>
+    /*
+        section
+    */
+    @media screen and (min-width:480px) {
+        section {width: 100%;}
+    }
+    @media screen and (min-width:1024px) {
+        section {width: 768px;}
+    }
     section {
+        margin: 0 auto;
         transition: all 0.5s;
     }
-
-    section .post_create {
+    section .create {
         backface-visibility: hidden;
         cursor: pointer;
         display: flex;
@@ -145,26 +231,41 @@
         background: #367678;
         transition: all 0.2s;
     }
-
-        section .post_create:hover {
-
+        section .create:hover {
             transform: scale(1.01);
             filter: drop-shadow(0px 0px 0.66rem rgba(47,72,88,.5));
         }
-
-    section .post_all {
+    section .item_all {
         list-style: none;
-
         display: flex;
         align-items: flex-start;
         justify-content: center;
         flex-wrap: wrap;
-
         width: 100%;
         height: auto;
-
         margin: 0px auto;
         padding: 0px;
     }
-
+    /*
+        modal
+    */
+    .modal-editer-enter,.modal-editer-leave-to,
+    .modal-viewer-enter,.modal-viewer-leave-to
+    {
+        transform: translateX(100vw);
+    }
+    .modal-editer-enter-to,.modal-editer-leave,
+    .modal-viewer-enter-to,.modal-viewer-leave
+    {
+        transform: translateX(0);
+    }
+    .modal-editer_container,.modal-viewer_container{
+        overflow-y: auto;
+        position:fixed;
+        top:0;
+        left:0;
+        bottom:0;
+        width: 100%;
+        transition: all 0.5s;
+    }
 </style>
